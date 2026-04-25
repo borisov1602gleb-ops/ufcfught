@@ -1787,12 +1787,10 @@
 
         // Экспорт и Импорт
         function exportData() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
             const jsonStr = JSON.stringify(appData, null, 2);
             const blob = new Blob([jsonStr], { type: "application/json" });
             const url = URL.createObjectURL(blob);
             const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href",     dataStr);
             downloadAnchorNode.setAttribute("href", url);
             downloadAnchorNode.setAttribute("download", "urban_cup_data.json");
             document.body.appendChild(downloadAnchorNode);
