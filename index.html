@@ -14,17 +14,17 @@
            CSS ПЕРЕМЕННЫЕ И БАЗОВЫЕ НАСТРОЙКИ
            ========================================================================== */
         :root {
-            --color-bg: #010a17; /* Deep UEFA Navy */
-            --color-bg-alt: #051329;
-            --color-card: #0a1835;
-            --color-card-hover: #10234a;
+            --color-bg: #09090b;
+            --color-bg-alt: #18181b;
+            --color-card: #18181b;
+            --color-card-hover: #27272a;
             --color-primary: #a3e635; /* Electric lime */
             --color-primary-hover: #bef264;
             --color-text: #fafafa;
-            --color-text-muted: #8b9bb4;
-            --color-border: rgba(163, 230, 53, 0.15); /* Greenish subtle border */
+            --color-text-muted: #a1a1aa;
+            --color-border: #27272a;
             --color-gold: #fbbf24;
-            --color-silver: #e2e8f0;
+            --color-silver: #e4e4e7;
             --color-bronze: #d97706;
             --color-danger: #e74c3c;
             --font-main: 'Inter', sans-serif;
@@ -33,9 +33,9 @@
             --header-height: 70px;
             
             /* Переменные для полупрозрачных фонов */
-            --color-header-bg: rgba(1, 10, 23, 0.85);
-            --color-card-glass: rgba(10, 24, 53, 0.6);
-            --shadow-elevation: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+            --color-header-bg: rgba(9, 9, 11, 0.75);
+            --color-card-glass: rgba(24, 24, 27, 0.6);
+            --shadow-elevation: 0 10px 40px rgba(0,0,0,0.5);
         }
 
         /* СВЕТЛАЯ ТЕМА */
@@ -130,14 +130,12 @@
         }
 
         .section-title {
-            font-size: 2rem;
-            font-weight: 800;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
             margin-bottom: 2rem;
             position: relative;
             display: inline-block;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
         }
 
         .section-title::after {
@@ -271,7 +269,7 @@
             margin-top: calc(-1 * var(--header-height) - 20px);
             padding-top: var(--header-height);
             border-bottom: 1px solid var(--color-border);
-            background: linear-gradient(to bottom, rgba(1, 10, 23, 0.5), var(--color-bg)), url('https://images.unsplash.com/photo-1556056504-5c7696c4c28d?q=80&w=2000&auto=format&fit=crop') center/cover no-repeat;
+            background: linear-gradient(to bottom, rgba(0, 10, 26, 0.4), var(--color-bg)), url('https://images.unsplash.com/photo-1508344928928-7137b29de218?q=80&w=2000&auto=format&fit=crop') center/cover no-repeat;
             overflow: hidden;
         }
 
@@ -280,9 +278,9 @@
             content: '';
             position: absolute;
             top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(ellipse at 50% 0%, rgba(163, 230, 53, 0.15) 0%, transparent 60%),
-                        radial-gradient(circle at 80% 20%, rgba(0, 100, 255, 0.2) 0%, transparent 40%);
-            opacity: 1;
+            background: radial-gradient(circle at 50% 50%, var(--color-primary) 0%, transparent 25%),
+                        radial-gradient(circle at 80% 20%, var(--color-primary-hover) 0%, transparent 25%);
+            opacity: 0.2;
             z-index: -1;
             animation: rotateGradient 20s linear infinite;
             pointer-events: none;
@@ -323,7 +321,6 @@
             font-weight: 800;
             border-radius: 30px;
             transition: all var(--transition-speed);
-            box-shadow: var(--neon-glow);
             display: inline-block;
             text-transform: uppercase;
         }
@@ -332,7 +329,6 @@
             background-color: var(--color-primary-hover);
             color: #000;
             transform: translateY(-3px);
-            box-shadow: 0 0 25px rgba(204, 255, 0, 0.6);
         }
 
         /* Статистика */
@@ -661,23 +657,19 @@
         }
 
         .tab-btn {
-            padding: 10px 24px;
-            background-color: rgba(255,255,255,0.02);
+            padding: 8px 20px;
+            background-color: transparent;
             color: var(--color-text-muted);
-            border: 1px solid transparent;
-            border-radius: 8px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 0.85rem;
+            border: 1px solid var(--color-border);
+            border-radius: 20px;
+            font-weight: 500;
             transition: all var(--transition-speed);
         }
 
         .tab-btn:hover, .tab-btn.active {
-            background-color: rgba(163, 230, 53, 0.1);
-            border-color: var(--color-primary);
-            color: var(--color-primary);
-            box-shadow: 0 0 15px rgba(163, 230, 53, 0.15);
+            background-color: var(--color-text);
+            border-color: var(--color-text);
+            color: var(--color-bg);
         }
 
         .table-responsive {
@@ -1049,6 +1041,23 @@
             100% { transform: rotate(40deg); }
         }
 
+        /* Анимация пенальти (для режима жеребьевки) */
+        .penalty-ball { animation: pen-ball-anim 1.5s infinite ease-in; }
+        @keyframes pen-ball-anim {
+            0%, 15% { transform: translate(0, 0); }
+            40%, 100% { transform: translate(250px, -60px); }
+        }
+        .kick-leg-penalty { animation: pen-leg-anim 1.5s infinite ease-in-out; transform-origin: 50px 100px; }
+        @keyframes pen-leg-anim {
+            0% { transform: rotate(-40deg); }
+            15%, 100% { transform: rotate(20deg); }
+        }
+        .gk-jump { animation: gk-anim 1.5s infinite ease-out; transform-origin: 320px 145px; }
+        @keyframes gk-anim {
+            0%, 20% { transform: translate(0, 0) rotate(0deg); }
+            45%, 100% { transform: translate(-10px, 30px) rotate(-40deg); }
+        }
+
         /* ==========================================================================
            ФУТЕР
            ========================================================================== */
@@ -1136,6 +1145,10 @@
         ⚠️ ВНИМАНИЕ: ВКЛЮЧЕН РЕЖИМ ТЕХНИЧЕСКИХ РАБОТ. ОБЫЧНЫЕ ПОЛЬЗОВАТЕЛИ ВИДЯТ ЗАГЛУШКУ.
     </div>
 
+    <div id="admin-draw-banner" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; background: var(--color-primary); color: var(--color-bg); text-align: center; padding: 6px; z-index: 10001; font-weight: 700; font-size: 0.85rem; letter-spacing: 1px;">
+        ⚽ ВНИМАНИЕ: ВКЛЮЧЕН РЕЖИМ "СКОРО ЖЕРЕБЬЕВКА". ОБЫЧНЫЕ ПОЛЬЗОВАТЕЛИ ВИДЯТ ЗАСТАВКУ.
+    </div>
+
     <!-- ЭКРАН ТЕХНИЧЕСКИХ РАБОТ -->
     <div id="maintenance-screen" class="maint-overlay hidden">
         <div class="football-anim-container">
@@ -1162,6 +1175,39 @@
         </div>
         <h1>Ведутся работы</h1>
         <p>Мы делаем сайт URBAN CUP ещё лучше. Скоро вернёмся!</p>
+    </div>
+
+    <!-- ЭКРАН ЖЕРЕБЬЕВКИ -->
+    <div id="draw-screen" class="maint-overlay hidden">
+        <div class="football-anim-container">
+            <svg viewBox="0 0 400 150" width="100%" height="150" style="max-width: 400px;">
+                <!-- Ворота -->
+                <g stroke="var(--color-border)" stroke-width="4" fill="none">
+                    <rect x="320" y="30" width="60" height="120" />
+                    <line x1="320" y1="30" x2="380" y2="150" />
+                    <line x1="380" y1="30" x2="320" y2="150" />
+                </g>
+                <!-- Вратарь -->
+                <g stroke="var(--color-danger)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none" class="gk-jump">
+                    <circle cx="320" cy="80" r="10" fill="var(--color-danger)"/>
+                    <line x1="320" y1="90" x2="320" y2="120"/>
+                    <line x1="320" y1="120" x2="305" y2="145"/> <line x1="320" y1="120" x2="335" y2="145"/>
+                    <line x1="320" y1="100" x2="295" y2="70"/> <line x1="320" y1="100" x2="345" y2="70"/>
+                </g>
+                <!-- Игрок (Бьющий пенальти) -->
+                <g stroke="var(--color-text-muted)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+                    <circle cx="50" cy="50" r="15" fill="var(--color-text-muted)"/>
+                    <line x1="50" y1="65" x2="50" y2="100"/>
+                    <line x1="50" y1="75" x2="30" y2="95"/> <line x1="50" y1="75" x2="70" y2="95"/>
+                    <line x1="50" y1="100" x2="40" y2="145"/>
+                    <line x1="50" y1="100" x2="70" y2="135" class="kick-leg-penalty"/>
+                </g>
+                <!-- Мяч -->
+                <circle cx="80" cy="135" r="10" fill="var(--color-primary)" class="penalty-ball"/>
+            </svg>
+        </div>
+        <h1>Скоро жеребьевка</h1>
+        <p>Приготовьтесь! Распределение команд по группам начнется с минуты на минуту.</p>
     </div>
 
     <!-- НАВИГАЦИЯ -->
@@ -1422,6 +1468,17 @@
                             </div>
                         </div>
 
+                        <div class="form-group toggle-group">
+                            <label class="switch">
+                                <input type="checkbox" id="set-draw" onchange="toggleDrawMode()">
+                                <span class="slider"></span>
+                            </label>
+                            <div>
+                                <strong style="display:block; color:var(--color-primary);">Режим "Скоро жеребьевка"</strong>
+                                <span style="font-size: 0.8rem; color:var(--color-text-muted);">Показывает заставку ожидания жеребьевки с анимацией пенальти</span>
+                            </div>
+                        </div>
+
                         <div class="form-group">
                             <label>Название турнира</label>
                             <input type="text" id="set-title">
@@ -1548,6 +1605,7 @@
                 finalDate: "2025-08-30",
                 mode: "group",
                 maintenance: false,
+                drawMode: false,
                 theme: "dark",
                 roadmap: [
                     { status: "completed", date: "15.06", text: "Регистрация команд" },
@@ -1674,28 +1732,38 @@
         }
 
         /* ==========================================================================
-           ОБРАБОТЧИК РЕЖИМА ТЕХНИЧЕСКИХ РАБОТ
+           ОБРАБОТЧИК ЗАСТАВОК (ТЕХ. РАБОТЫ И ЖЕРЕБЬЕВКА)
            ========================================================================== */
         function applyMaintenance() {
-            const screen = document.getElementById('maintenance-screen');
-            const banner = document.getElementById('admin-maint-banner');
-            if (!screen || !banner) return;
+            const maintScreen = document.getElementById('maintenance-screen');
+            const maintBanner = document.getElementById('admin-maint-banner');
+            const drawScreen = document.getElementById('draw-screen');
+            const drawBanner = document.getElementById('admin-draw-banner');
             const isAdminView = !document.getElementById('admin').classList.contains('hidden');
+            
+            if (!maintScreen) return;
+
+            maintScreen.classList.add('hidden');
+            maintBanner.classList.add('hidden');
+            if(drawScreen) drawScreen.classList.add('hidden');
+            if(drawBanner) drawBanner.classList.add('hidden');
+            document.body.style.overflow = '';
             
             if (appData.settings.maintenance) {
                 if (isAdminView) {
-                    screen.classList.add('hidden');
-                    document.body.style.overflow = '';
-                    banner.classList.remove('hidden');
+                    maintBanner.classList.remove('hidden');
                 } else {
-                    screen.classList.remove('hidden');
+                    maintScreen.classList.remove('hidden');
                     document.body.style.overflow = 'hidden';
-                    banner.classList.add('hidden');
+                }
+            } else if (appData.settings.drawMode) {
+                if (isAdminView) {
+                    if(drawBanner) drawBanner.classList.remove('hidden');
+                } else {
+                    if(drawScreen) drawScreen.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
                 }
             } else {
-                screen.classList.add('hidden');
-                banner.classList.add('hidden');
-                document.body.style.overflow = '';
             }
         }
 
@@ -1755,6 +1823,11 @@
 
         // Скрытый вход в админку с экрана технических работ (двойной клик по экрану)
         document.getElementById('maintenance-screen').addEventListener('dblclick', () => {
+            document.getElementById('login-modal').classList.add('open');
+        });
+        
+        // Скрытый вход с экрана жеребьевки
+        document.getElementById('draw-screen').addEventListener('dblclick', () => {
             document.getElementById('login-modal').classList.add('open');
         });
 
@@ -2354,6 +2427,7 @@
             document.getElementById('set-date').value = appData.settings.finalDate;
             document.getElementById('set-maintenance').checked = !!appData.settings.maintenance;
             document.getElementById('set-theme').checked = appData.settings.theme === 'light';
+            if(document.getElementById('set-draw')) document.getElementById('set-draw').checked = !!appData.settings.drawMode;
             if(document.getElementById('set-show-roadmap')) document.getElementById('set-show-roadmap').checked = !!appData.settings.showRoadmap;
         }
 
@@ -2483,6 +2557,12 @@
             appData.settings.theme = document.getElementById('set-theme').checked ? 'light' : 'dark';
             saveData();
             applyTheme();
+        }
+
+        function toggleDrawMode() {
+            appData.settings.drawMode = document.getElementById('set-draw').checked;
+            saveData();
+            applyMaintenance();
         }
 
         function toggleRoadmapVisibility() {
