@@ -1435,7 +1435,7 @@
             const screen = document.getElementById('maintenance-screen');
             const banner = document.getElementById('admin-maint-banner');
             if (!screen || !banner) return;
-            const isAdminView = window.location.hash === '#admin';
+            const isAdminView = !document.getElementById('admin').classList.contains('hidden');
             
             if (appData.settings.maintenance) {
                 if (isAdminView) {
