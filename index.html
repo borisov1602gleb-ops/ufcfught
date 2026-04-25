@@ -14,17 +14,17 @@
            CSS ПЕРЕМЕННЫЕ И БАЗОВЫЕ НАСТРОЙКИ
            ========================================================================== */
         :root {
-            --color-bg: #09090b;
-            --color-bg-alt: #18181b;
-            --color-card: #18181b;
-            --color-card-hover: #27272a;
+            --color-bg: #010a17; /* Deep UEFA Navy */
+            --color-bg-alt: #051329;
+            --color-card: #0a1835;
+            --color-card-hover: #10234a;
             --color-primary: #a3e635; /* Electric lime */
             --color-primary-hover: #bef264;
             --color-text: #fafafa;
-            --color-text-muted: #a1a1aa;
-            --color-border: #27272a;
+            --color-text-muted: #8b9bb4;
+            --color-border: rgba(163, 230, 53, 0.15); /* Greenish subtle border */
             --color-gold: #fbbf24;
-            --color-silver: #e4e4e7;
+            --color-silver: #e2e8f0;
             --color-bronze: #d97706;
             --color-danger: #e74c3c;
             --font-main: 'Inter', sans-serif;
@@ -33,9 +33,9 @@
             --header-height: 70px;
             
             /* Переменные для полупрозрачных фонов */
-            --color-header-bg: rgba(9, 9, 11, 0.75);
-            --color-card-glass: rgba(24, 24, 27, 0.6);
-            --shadow-elevation: 0 10px 40px rgba(0,0,0,0.5);
+            --color-header-bg: rgba(1, 10, 23, 0.85);
+            --color-card-glass: rgba(10, 24, 53, 0.6);
+            --shadow-elevation: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.05);
         }
 
         /* СВЕТЛАЯ ТЕМА */
@@ -130,12 +130,14 @@
         }
 
         .section-title {
-            font-size: 2.2rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
             margin-bottom: 2rem;
             position: relative;
             display: inline-block;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
         }
 
         .section-title::after {
@@ -269,7 +271,7 @@
             margin-top: calc(-1 * var(--header-height) - 20px);
             padding-top: var(--header-height);
             border-bottom: 1px solid var(--color-border);
-            background: linear-gradient(to bottom, rgba(0, 10, 26, 0.4), var(--color-bg)), url('https://images.unsplash.com/photo-1508344928928-7137b29de218?q=80&w=2000&auto=format&fit=crop') center/cover no-repeat;
+            background: linear-gradient(to bottom, rgba(1, 10, 23, 0.5), var(--color-bg)), url('https://images.unsplash.com/photo-1556056504-5c7696c4c28d?q=80&w=2000&auto=format&fit=crop') center/cover no-repeat;
             overflow: hidden;
         }
 
@@ -278,9 +280,9 @@
             content: '';
             position: absolute;
             top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle at 50% 50%, var(--color-primary) 0%, transparent 25%),
-                        radial-gradient(circle at 80% 20%, var(--color-accent) 0%, transparent 25%);
-            opacity: 0.2;
+            background: radial-gradient(ellipse at 50% 0%, rgba(163, 230, 53, 0.15) 0%, transparent 60%),
+                        radial-gradient(circle at 80% 20%, rgba(0, 100, 255, 0.2) 0%, transparent 40%);
+            opacity: 1;
             z-index: -1;
             animation: rotateGradient 20s linear infinite;
             pointer-events: none;
@@ -659,19 +661,23 @@
         }
 
         .tab-btn {
-            padding: 8px 20px;
-            background-color: transparent;
+            padding: 10px 24px;
+            background-color: rgba(255,255,255,0.02);
             color: var(--color-text-muted);
-            border: 1px solid var(--color-border);
-            border-radius: 20px;
-            font-weight: 500;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.85rem;
             transition: all var(--transition-speed);
         }
 
         .tab-btn:hover, .tab-btn.active {
-            background-color: var(--color-text);
-            border-color: var(--color-text);
-            color: var(--color-bg);
+            background-color: rgba(163, 230, 53, 0.1);
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+            box-shadow: 0 0 15px rgba(163, 230, 53, 0.15);
         }
 
         .table-responsive {
@@ -1426,6 +1432,10 @@
                         </div>
                         <button class="btn-primary" onclick="adminSaveSettings()">Сохранить настройки</button>
                         
+                        <h3 style="margin-top: 40px; margin-bottom: 20px; font-size: 1.5rem;">Дорожная карта</h3>
+                        <div id="admin-roadmap-list"></div>
+                        <button class="btn-sm" style="margin-bottom: 30px; background: var(--color-card); border: 1px solid var(--color-border); color: var(--color-text);" onclick="adminAddRoadmap()">+ Добавить этап</button>
+
                         <div class="admin-actions">
                             <button class="btn-primary" onclick="exportData()">Скачать JSON бекап</button>
                             <button class="btn-sm" style="background:var(--color-bg); border:1px solid var(--color-border);" onclick="document.getElementById('import-file').click()">Восстановить из JSON</button>
@@ -1539,6 +1549,12 @@
                 mode: "group",
                 maintenance: false,
                 theme: "dark",
+                roadmap: [
+                    { status: "completed", date: "15.06", text: "Регистрация команд" },
+                    { status: "in-progress", date: "01.07", text: "Групповой этап" },
+                    { status: "pending", date: "01.08", text: "Плей-офф" },
+                    { status: "pending", date: "30.08", text: "Гранд Финал" }
+                ],
                 titles: {
                     groups: "Групповой этап",
                     playoff: "Плей-офф",
@@ -1636,6 +1652,11 @@
 
         // Загрузка данных из localStorage или использование дефолтных
         let appData = JSON.parse(localStorage.getItem('urbanCupData')) || JSON.parse(JSON.stringify(mockData));
+
+        // Патч для дорожной карты (если ее не было в старых сохранениях)
+        if (!appData.settings.roadmap) {
+            appData.settings.roadmap = JSON.parse(JSON.stringify(mockData.settings.roadmap));
+        }
 
         // Миграция старых данных: автоматическое вычисление тура (1, 2, 3...)
         appData.matches.forEach(m => {
@@ -1842,6 +1863,22 @@
                     <div class="news-full" id="news-full-${n.id}">${n.text}</div>
                 </div>
             `).join('');
+
+            // Дорожная карта
+            const rmList = document.getElementById('roadmap-list');
+            if(rmList) {
+                rmList.innerHTML = appData.settings.roadmap.map(r => `
+                    <div class="roadmap-item ${r.status}">
+                        <div class="roadmap-icon">
+                            ${r.status === 'completed' ? '✓' : (r.status === 'in-progress' ? '⚡' : '⏳')}
+                        </div>
+                        <div class="roadmap-content">
+                            <div class="roadmap-status">${r.status === 'completed' ? 'Завершено' : (r.status === 'in-progress' ? 'В процессе' : 'Ожидается')}</div>
+                            <div class="roadmap-text"><span style="color:var(--color-primary); margin-right:10px;">${r.date}</span> ${r.text}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
         }
 
         function toggleNews(id, btn) {
