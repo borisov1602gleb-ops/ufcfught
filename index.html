@@ -44,8 +44,9 @@
             --color-bg-alt: #f1f5f9;
             --color-card: #ffffff;
             --color-card-hover: #f8fafc;
-            --color-primary: #16a34a; /* Более глубокий зеленый для контраста */
-            --color-primary-hover: #15803d;
+            --color-primary: #0044ff; /* Спортивный синий для светлой темы */
+            --color-primary-hover: #0033cc;
+            --color-accent: #ff4400; 
             --color-text: #0f172a;
             --color-text-muted: #64748b;
             --color-border: #e2e8f0;
@@ -53,6 +54,8 @@
             --color-header-bg: rgba(248, 250, 252, 0.85);
             --color-card-glass: rgba(255, 255, 255, 0.8);
             --shadow-elevation: 0 10px 40px rgba(15, 23, 42, 0.08);
+            --neon-glow: 0 5px 15px rgba(0, 68, 255, 0.2);
+            --neon-glow-accent: 0 5px 15px rgba(255, 68, 0, 0.2);
         }
 
         * {
@@ -73,6 +76,42 @@
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
             transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+
+        /* Фоновые заблюренные силуэты спортсменов */
+        .sports-bg-silhouettes {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: -2;
+            overflow: hidden;
+        }
+        .silhouette {
+            position: absolute;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.12;
+            filter: grayscale(1) contrast(150%) blur(8px);
+            mix-blend-mode: screen;
+            border-radius: 50%;
+            -webkit-mask-image: radial-gradient(circle at center, black 10%, transparent 60%);
+            mask-image: radial-gradient(circle at center, black 10%, transparent 60%);
+            animation: float-silhouettes 25s infinite alternate ease-in-out;
+        }
+        [data-theme="light"] .silhouette { mix-blend-mode: multiply; opacity: 0.05; filter: grayscale(1) blur(10px); }
+        .player-1 {
+            /* Удар через себя (Bicycle kick) */
+            background-image: url('https://images.unsplash.com/photo-1518605368461-1eb5e10e6a89?q=80&w=800&auto=format&fit=crop');
+            width: 800px; height: 800px; top: -15%; right: -15%;
+        }
+        .player-2 {
+            /* Прыжок / Удар головой */
+            background-image: url('https://images.unsplash.com/photo-1551958219-acbc608c6377?q=80&w=800&auto=format&fit=crop');
+            width: 900px; height: 900px; bottom: -20%; left: -20%; animation-delay: -12s;
+        }
+        @keyframes float-silhouettes {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            100% { transform: translate(-40px, 50px) scale(1.05) rotate(5deg); }
         }
 
         a {
@@ -246,9 +285,9 @@
             content: '';
             position: absolute;
             top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle at 50% 50%, var(--color-primary) 0%, transparent 40%),
-                        radial-gradient(circle at 80% 20%, var(--color-gold) 0%, transparent 30%);
-            opacity: 0.15;
+            background: radial-gradient(circle at 50% 50%, var(--color-primary) 0%, transparent 30%),
+                        radial-gradient(circle at 80% 20%, var(--color-accent) 0%, transparent 30%);
+            opacity: 0.08;
             z-index: -1;
             animation: rotateGradient 20s linear infinite;
             pointer-events: none;
@@ -277,25 +316,28 @@
             margin-bottom: 30px;
             font-weight: 400;
             animation: fadeInUp 1s ease-out;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         .btn-primary {
             background-color: var(--color-primary);
-            color: var(--color-bg);
+            color: #000; /* Черный текст на кислотном фоне выглядит агрессивнее */
             padding: 12px 24px;
             font-size: 1.1rem;
-            font-weight: 700;
+            font-weight: 800;
             border-radius: 30px;
             transition: all var(--transition-speed);
-            box-shadow: 0 4px 15px rgba(33, 160, 56, 0.4);
+            box-shadow: var(--neon-glow);
             display: inline-block;
+            text-transform: uppercase;
         }
 
         .btn-primary:hover {
             background-color: var(--color-primary-hover);
-            color: var(--color-bg);
+            color: #000;
             transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(163, 230, 53, 0.2);
+            box-shadow: 0 0 25px rgba(204, 255, 0, 0.6);
         }
 
         /* Статистика */
@@ -390,10 +432,11 @@
 
         .match-status.live {
             color: var(--color-primary);
-            font-weight: 700;
+            font-weight: 800;
             display: flex;
             align-items: center;
             gap: 5px;
+            text-shadow: 0 0 8px var(--color-primary);
         }
 
         .pulse {
@@ -419,17 +462,21 @@
 
         .team-name.winner {
             color: var(--color-primary);
+            text-shadow: 0 0 10px rgba(204, 255, 0, 0.4);
         }
 
         .match-score {
             flex: 0 0 80px;
             text-align: center;
             font-size: 1.4rem;
-            font-weight: 700;
-            background: transparent;
+            font-weight: 900;
+            background: rgba(204, 255, 0, 0.05);
+            color: var(--color-primary);
             padding: 5px 10px;
             border-radius: 8px;
-            border: 1px solid var(--color-border);
+            border: 1px solid rgba(204, 255, 0, 0.3);
+            box-shadow: inset 0 0 10px rgba(204, 255, 0, 0.1), 0 0 10px rgba(204, 255, 0, 0.1);
+            text-shadow: 0 0 8px rgba(204, 255, 0, 0.5);
         }
 
         .match-score.vs {
@@ -437,6 +484,7 @@
             color: var(--color-text-muted);
             border: none;
             background: transparent;
+            box-shadow: none; text-shadow: none;
         }
 
         /* Лидеры (Справа) */
@@ -453,16 +501,16 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            border: 1px solid var(--color-border);
-            border-left: 4px solid var(--color-primary);
-            box-shadow: var(--shadow-elevation);
+            border: 1px solid rgba(0, 240, 255, 0.1);
+            border-left: 4px solid var(--color-accent); /* Акцент на электрический синий */
+            box-shadow: var(--neon-glow-accent);
         }
 
         .leader-icon {
             width: 50px;
             height: 50px;
-            background-color: rgba(163, 230, 53, 0.1);
-            color: var(--color-primary);
+            background-color: rgba(0, 240, 255, 0.1);
+            color: var(--color-accent);
             border-radius: 50%;
             display: flex;
             justify-content: center;
@@ -666,8 +714,13 @@
         /* Подсветка в группах */
         .group-table tr.qualify td {
             border-left: 4px solid var(--color-primary);
+            background: rgba(204, 255, 0, 0.02);
         }
-        .group-table tr.qualify td:first-child { background: rgba(163, 230, 53, 0.05); }
+        .group-table tr.qualify td:first-child { 
+            background: rgba(204, 255, 0, 0.05); 
+            color: var(--color-primary); 
+            text-shadow: 0 0 8px rgba(204, 255, 0, 0.3); 
+        }
         .group-table tr.out td { color: var(--color-text-muted); }
 
         /* Подсветка призеров */
@@ -740,7 +793,9 @@
         
         .bracket-team.winner {
             color: var(--color-primary);
-            background-color: rgba(33, 160, 56, 0.05);
+            background-color: rgba(204, 255, 0, 0.05);
+            text-shadow: 0 0 5px rgba(204, 255, 0, 0.3);
+            border-left: 3px solid var(--color-primary);
         }
         
         .bracket-score { font-weight: 800; }
@@ -1053,6 +1108,12 @@
 </head>
 <body>
 
+    <!-- ФОНОВЫЕ СИЛУЭТЫ СПОРТСМЕНОВ -->
+    <div class="sports-bg-silhouettes">
+        <div class="silhouette player-1"></div>
+        <div class="silhouette player-2"></div>
+    </div>
+
     <!-- УВЕДОМЛЕНИЕ ДЛЯ АДМИНА О ТЕХ РАБОТАХ -->
     <div id="admin-maint-banner" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; background: var(--color-danger); color: white; text-align: center; padding: 6px; z-index: 10001; font-weight: 700; font-size: 0.85rem; letter-spacing: 1px;">
         ⚠️ ВНИМАНИЕ: ВКЛЮЧЕН РЕЖИМ ТЕХНИЧЕСКИХ РАБОТ. ОБЫЧНЫЕ ПОЛЬЗОВАТЕЛИ ВИДЯТ ЗАГЛУШКУ.
@@ -1177,57 +1238,8 @@
 
                 <div class="roadmap-container">
                     <h2 class="section-title">Дорожная карта турнира</h2>
-                    <div class="roadmap">
-                        <!-- Этап 1 -->
-                        <div class="roadmap-item completed">
-                            <div class="roadmap-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            </div>
-                            <div class="roadmap-content">
-                                <div class="roadmap-status">25.04 • Завершено</div>
-                                <div class="roadmap-text" data-edit-key="settings.roadmap.step1">Формирование концепции турнира</div>
-                            </div>
-                        </div>
-                        <!-- Этап 2 -->
-                        <div class="roadmap-item in-progress">
-                            <div class="roadmap-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg>
-                            </div>
-                            <div class="roadmap-content">
-                                <div class="roadmap-status">В процессе</div>
-                                <div class="roadmap-text" data-edit-key="settings.roadmap.step2">Создание сайта</div>
-                            </div>
-                        </div>
-                        <!-- Этап 3 -->
-                        <div class="roadmap-item">
-                            <div class="roadmap-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/></svg>
-                            </div>
-                            <div class="roadmap-content">
-                                <div class="roadmap-status">Ожидается</div>
-                                <div class="roadmap-text" data-edit-key="settings.roadmap.step3">Привлечение участников</div>
-                            </div>
-                        </div>
-                        <!-- Этап 4 -->
-                        <div class="roadmap-item">
-                            <div class="roadmap-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/></svg>
-                            </div>
-                            <div class="roadmap-content">
-                                <div class="roadmap-status">Ожидается</div>
-                                <div class="roadmap-text" data-edit-key="settings.roadmap.step4">Регистрация команд</div>
-                            </div>
-                        </div>
-                        <!-- Этап 5 -->
-                        <div class="roadmap-item">
-                            <div class="roadmap-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/></svg>
-                            </div>
-                            <div class="roadmap-content">
-                                <div class="roadmap-status">01.01 • Финал</div>
-                                <div class="roadmap-text" data-edit-key="settings.roadmap.step5">Проведение турнира</div>
-                            </div>
-                        </div>
+                    <div class="roadmap" id="roadmap-list">
+                        <!-- Генерируется через JS -->
                     </div>
                 </div>
 
@@ -2179,6 +2191,24 @@
             `).join('');
             document.getElementById('admin-manage-teams-list').innerHTML = teamsEditHtml;
 
+            // Дорожная карта
+            let roadmapHtml = appData.settings.roadmap.map((r, i) => `
+                <div class="admin-row" style="grid-template-columns: 100px 2fr 1fr auto auto;">
+                    <div><label>Дата</label><input type="text" id="rm-date-${i}" value="${r.date || ''}" placeholder="ДД.ММ"></div>
+                    <div><label>Название этапа</label><input type="text" id="rm-text-${i}" value="${r.text}"></div>
+                    <div><label>Статус</label>
+                        <select id="rm-status-${i}">
+                            <option value="completed" ${r.status === 'completed' ? 'selected' : ''}>Завершено</option>
+                            <option value="in-progress" ${r.status === 'in-progress' ? 'selected' : ''}>В процессе</option>
+                            <option value="pending" ${r.status === 'pending' ? 'selected' : ''}>Ожидается</option>
+                        </select>
+                    </div>
+                    <button class="btn-sm" style="align-self: end; margin-bottom: 2px;" onclick="adminSaveRoadmap(${i})">Сохранить</button>
+                    <button class="btn-sm btn-danger" style="align-self: end; margin-bottom: 2px;" onclick="adminDeleteRoadmap(${i})">Удалить</button>
+                </div>
+            `).join('');
+            if(document.getElementById('admin-roadmap-list')) document.getElementById('admin-roadmap-list').innerHTML = roadmapHtml;
+
             // Новости
             let newsHtml = appData.news.map((n, i) => `
                 <div style="background:var(--color-card); padding:10px; margin-bottom:10px; border:1px solid var(--color-border); border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
@@ -2193,6 +2223,7 @@
             document.getElementById('set-date').value = appData.settings.finalDate;
             document.getElementById('set-maintenance').checked = !!appData.settings.maintenance;
             document.getElementById('set-theme').checked = appData.settings.theme === 'light';
+            if(document.getElementById('set-show-roadmap')) document.getElementById('set-show-roadmap').checked = !!appData.settings.showRoadmap;
         }
 
         function adminSaveMatch(index) {
@@ -2228,6 +2259,28 @@
             appData.teams[index].color = document.getElementById(`tc-${index}`).value || "#333";
             saveData();
             alert('Данные команды обновлены!');
+        }
+
+        function adminSaveRoadmap(index) {
+            appData.settings.roadmap[index].date = document.getElementById(`rm-date-${index}`).value;
+            appData.settings.roadmap[index].text = document.getElementById(`rm-text-${index}`).value;
+            appData.settings.roadmap[index].status = document.getElementById(`rm-status-${index}`).value;
+            saveData();
+            alert('Этап сохранен!');
+        }
+
+        function adminAddRoadmap() {
+            appData.settings.roadmap.push({ status: "pending", date: "", text: "Новый этап" });
+            saveData();
+            renderAdmin();
+        }
+
+        function adminDeleteRoadmap(index) {
+            if(confirm('Удалить этот этап дорожной карты?')) {
+                appData.settings.roadmap.splice(index, 1);
+                saveData();
+                renderAdmin();
+            }
         }
 
         function adminAddNews() {
@@ -2267,6 +2320,11 @@
             appData.settings.theme = document.getElementById('set-theme').checked ? 'light' : 'dark';
             saveData();
             applyTheme();
+        }
+
+        function toggleRoadmapVisibility() {
+            appData.settings.showRoadmap = document.getElementById('set-show-roadmap').checked;
+            saveData();
         }
 
         function adminSaveSettings() {
