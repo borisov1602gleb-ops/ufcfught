@@ -925,9 +925,29 @@
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(163, 230, 53, 0); }
         }
         .fade-in { animation: fadeInUp 0.5s ease-out; }
+
+        /* Стили для Live Edit режима */
+        [contenteditable="true"] {
+            outline: 2px dashed var(--color-primary) !important;
+            outline-offset: 6px;
+            background: rgba(163, 230, 53, 0.05);
+            border-radius: 8px;
+            cursor: text !important;
+            transition: all 0.2s;
+            min-width: 50px;
+        }
+        [contenteditable="true"]:focus {
+            background: rgba(163, 230, 53, 0.15);
+            outline-style: solid !important;
+        }
     </style>
 </head>
 <body>
+
+    <!-- УВЕДОМЛЕНИЕ ДЛЯ АДМИНА О ТЕХ РАБОТАХ -->
+    <div id="admin-maint-banner" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; background: var(--color-danger); color: white; text-align: center; padding: 6px; z-index: 10001; font-weight: 700; font-size: 0.85rem; letter-spacing: 1px;">
+        ⚠️ ВНИМАНИЕ: ВКЛЮЧЕН РЕЖИМ ТЕХНИЧЕСКИХ РАБОТ. ОБЫЧНЫЕ ПОЛЬЗОВАТЕЛИ ВИДЯТ ЗАГЛУШКУ.
+    </div>
 
     <!-- ЭКРАН ТЕХНИЧЕСКИХ РАБОТ -->
     <div id="maintenance-screen" class="maint-overlay hidden">
@@ -979,8 +999,8 @@
         <!-- СЕКЦИЯ 1: ГЛАВНАЯ -->
         <section id="home" class="view-section">
             <div class="hero">
-                <h1 id="hero-title">URBAN CUP 2025</h1>
-                <p>Городской открытый футбольный турнир</p>
+                <h1 id="hero-title" data-edit-key="settings.title">URBAN CUP 2025</h1>
+                <p id="hero-subtitle" data-edit-key="settings.subtitle">Городской открытый футбольный турнир</p>
                 <a href="#schedule" class="btn-primary">Смотреть расписание</a>
             </div>
 
@@ -1053,7 +1073,7 @@
 
         <!-- СЕКЦИЯ 2: ГРУППЫ -->
         <section id="groups" class="view-section hidden container">
-            <h2 class="section-title">Групповой этап</h2>
+            <h2 class="section-title" id="title-groups" data-edit-key="settings.titles.groups">Групповой этап</h2>
             
             <div class="tabs" id="group-tabs">
                 <button class="tab-btn active" data-target="group-A">Группа A</button>
@@ -1069,7 +1089,7 @@
 
         <!-- СЕКЦИЯ 3: ПЛЕЙ-ОФФ -->
         <section id="playoff" class="view-section hidden container">
-            <h2 class="section-title">Плей-офф</h2>
+            <h2 class="section-title" id="title-playoff" data-edit-key="settings.titles.playoff">Плей-офф</h2>
             <div class="bracket-container" id="bracket-content">
                 <!-- Генерируется JS -->
             </div>
@@ -1077,7 +1097,7 @@
 
         <!-- СЕКЦИЯ 4 и 5: СТАТИСТИКА (БОМБАРДИРЫ И АССИСТЕНТЫ) -->
         <section id="stats" class="view-section hidden container">
-            <h2 class="section-title">Статистика игроков</h2>
+            <h2 class="section-title" id="title-stats" data-edit-key="settings.titles.stats">Статистика игроков</h2>
             
             <div class="tabs">
                 <button class="tab-btn active" id="btn-tab-scorers">Бомбардиры</button>
@@ -1100,7 +1120,7 @@
 
         <!-- СЕКЦИЯ 6: РАСПИСАНИЕ -->
         <section id="schedule" class="view-section hidden container">
-            <h2 class="section-title">Расписание матчей</h2>
+            <h2 class="section-title" id="title-schedule" data-edit-key="settings.titles.schedule">Расписание матчей</h2>
             
             <div class="tabs" id="schedule-filters">
                 <button class="tab-btn active" data-filter="all">Все</button>
@@ -1117,7 +1137,7 @@
 
         <!-- СЕКЦИЯ 7: КОМАНДЫ -->
         <section id="teams" class="view-section hidden container">
-            <h2 class="section-title">Команды турнира</h2>
+            <h2 class="section-title" id="title-teams" data-edit-key="settings.titles.teams">Команды турнира</h2>
             <div class="teams-grid" id="teams-grid">
                 <!-- Генерируется JS -->
             </div>
@@ -1196,6 +1216,12 @@
                         <h3 style="margin-bottom: 20px; font-size: 1.5rem;">Управление турниром</h3>
                         
                         <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; border: 1px solid var(--color-border); margin-bottom: 20px;">
+                            <h4 style="margin-bottom: 10px; color: var(--color-primary);">Режим Live-редактирования</h4>
+                            <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 15px;">Позволяет изменять заголовки и тексты прямо на страницах сайта, кликая по ним.</p>
+                            <button class="btn-primary" onclick="startLiveEdit()">Включить Live Edit</button>
+                        </div>
+
+                        <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; border: 1px solid var(--color-border); margin-bottom: 20px;">
                             <h4 style="margin-bottom: 10px; color: var(--color-primary);">Жеребьевка групп</h4>
                             <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 15px;">Случайным образом распределяет все 16 команд по 4 группам (A, B, C, D).</p>
                             <button class="btn-primary" onclick="adminRunDraw()">Провести жеребьевку</button>
@@ -1230,6 +1256,13 @@
             <input type="password" id="admin-password" class="search-bar" placeholder="Введите пароль">
             <button class="btn-primary" onclick="checkAdminPassword()" style="width: 100%;">Войти</button>
         </div>
+    </div>
+
+    <!-- ПАНЕЛЬ LIVE EDIT (ПЛАВАЮЩАЯ) -->
+    <div id="live-edit-toolbar" class="hidden" style="position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); background: var(--color-card); border: 2px solid var(--color-primary); padding: 15px 30px; border-radius: 40px; z-index: 10000; display: flex; gap: 15px; align-items: center; box-shadow: 0 10px 40px rgba(0,0,0,0.9);">
+        <span style="color: var(--color-primary); font-weight: bold; margin-right: 15px; display: flex; align-items: center; gap: 8px;"><div class="pulse"></div> Live Edit Активен</span>
+        <button class="btn-primary" style="padding: 8px 20px; font-size: 0.9rem;" onclick="saveLiveEdit()">Сохранить</button>
+        <button class="btn-sm btn-danger" style="padding: 8px 20px;" onclick="cancelLiveEdit()">Отмена</button>
     </div>
 
     <!-- ФУТЕР -->
@@ -1271,9 +1304,17 @@
         const mockData = {
             settings: {
                 title: "URBAN CUP 2025",
+                subtitle: "Городской открытый футбольный турнир",
                 finalDate: "2025-08-30",
                 mode: "group",
-                maintenance: false
+                maintenance: false,
+                titles: {
+                    groups: "Групповой этап",
+                    playoff: "Плей-офф",
+                    stats: "Статистика игроков",
+                    schedule: "Расписание матчей",
+                    teams: "Команды турнира"
+                }
             },
             teams: [
                 { id: "T01", name: "Динамит", group: "A", color: "#e74c3c" },
@@ -1375,14 +1416,23 @@
            ========================================================================== */
         function applyMaintenance() {
             const screen = document.getElementById('maintenance-screen');
-            if (!screen) return;
+            const banner = document.getElementById('admin-maint-banner');
+            if (!screen || !banner) return;
             const isAdminView = window.location.hash === '#admin';
             
-            if (appData.settings.maintenance && !isAdminView) {
-                screen.classList.remove('hidden');
-                document.body.style.overflow = 'hidden'; // Блокировка скролла
+            if (appData.settings.maintenance) {
+                if (isAdminView) {
+                    screen.classList.add('hidden');
+                    document.body.style.overflow = '';
+                    banner.classList.remove('hidden');
+                } else {
+                    screen.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+                    banner.classList.add('hidden');
+                }
             } else {
                 screen.classList.add('hidden');
+                banner.classList.add('hidden');
                 document.body.style.overflow = '';
             }
         }
@@ -1492,6 +1542,7 @@
         function renderHome() {
             document.title = appData.settings.title;
             document.getElementById('hero-title').innerText = appData.settings.title;
+            document.getElementById('hero-subtitle').innerText = appData.settings.subtitle || "Городской открытый футбольный турнир";
             
             const stats = calculateTeamStats();
             let totalMatches = appData.matches.filter(m => m.status === 'finished').length;
@@ -1998,6 +2049,47 @@
             alert('Статистика игроков обнулена!');
         }
 
+        /* ==========================================================================
+           LIVE EDIT (ВИЗУАЛЬНЫЙ РЕДАКТОР)
+           ========================================================================== */
+        function startLiveEdit() {
+            navigate('#home'); // Возврат на главную
+            document.getElementById('live-edit-toolbar').classList.remove('hidden');
+            document.querySelectorAll('[data-edit-key]').forEach(el => {
+                el.setAttribute('contenteditable', 'true');
+            });
+        }
+
+        function setNestedProperty(obj, path, value) {
+            const keys = path.split('.');
+            let current = obj;
+            for (let i = 0; i < keys.length - 1; i++) {
+                if (!current[keys[i]]) current[keys[i]] = {};
+                current = current[keys[i]];
+            }
+            current[keys[keys.length - 1]] = value;
+        }
+
+        function saveLiveEdit() {
+            document.querySelectorAll('[data-edit-key]').forEach(el => {
+                const key = el.getAttribute('data-edit-key');
+                const val = el.innerText.trim() || 'Текст';
+                setNestedProperty(appData, key, val);
+                el.removeAttribute('contenteditable');
+            });
+            document.getElementById('live-edit-toolbar').classList.add('hidden');
+            saveData();
+            alert('Изменения на сайте сохранены!');
+        }
+
+        function cancelLiveEdit() {
+            document.querySelectorAll('[data-edit-key]').forEach(el => {
+                el.removeAttribute('contenteditable');
+            });
+            document.getElementById('live-edit-toolbar').classList.add('hidden');
+            renderAll(); // Возврат исходных данных
+        }
+
         // Экспорт и Импорт
         function exportData() {
             const jsonStr = JSON.stringify(appData, null, 2);
@@ -2044,6 +2136,12 @@
            ИНИЦИАЛИЗАЦИЯ
            ========================================================================== */
         function renderAll() {
+            document.getElementById('title-groups').innerText = appData.settings.titles?.groups || "Групповой этап";
+            document.getElementById('title-playoff').innerText = appData.settings.titles?.playoff || "Плей-офф";
+            document.getElementById('title-stats').innerText = appData.settings.titles?.stats || "Статистика игроков";
+            document.getElementById('title-schedule').innerText = appData.settings.titles?.schedule || "Расписание матчей";
+            document.getElementById('title-teams').innerText = appData.settings.titles?.teams || "Команды турнира";
+
             renderHome();
             renderGroups();
             renderPlayoff();
