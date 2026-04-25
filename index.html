@@ -736,22 +736,87 @@
         /* ==========================================================================
            АДМИН ПАНЕЛЬ
            ========================================================================== */
-        .admin-panel { padding: 20px 0; }
+        .admin-dashboard {
+            background: var(--color-bg-alt);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius);
+            display: flex;
+            min-height: 600px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            margin-top: 20px;
+        }
+        @media (max-width: 768px) {
+            .admin-dashboard { flex-direction: column; }
+        }
+
+        .admin-sidebar {
+            width: 250px;
+            background: rgba(0,0,0,0.2);
+            border-right: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+        }
+        @media (max-width: 768px) {
+            .admin-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--color-border); flex-direction: row; flex-wrap: wrap; }
+        }
+
+        .admin-sidebar .tab-btn {
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            text-align: left;
+            padding: 20px 25px;
+            color: var(--color-text-muted);
+            border-left: 3px solid transparent;
+            font-size: 1rem;
+            width: 100%;
+        }
+        @media (max-width: 768px) {
+            .admin-sidebar .tab-btn { width: auto; border-left: none; border-bottom: 3px solid transparent; padding: 15px; }
+        }
+
+        .admin-sidebar .tab-btn.active, .admin-sidebar .tab-btn:hover {
+            background: rgba(163, 230, 53, 0.05);
+            color: var(--color-primary);
+            border-left-color: var(--color-primary);
+        }
+        @media (max-width: 768px) {
+            .admin-sidebar .tab-btn.active { border-left-color: transparent; border-bottom-color: var(--color-primary); }
+        }
+
+        .admin-content-area {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            max-height: 800px;
+        }
+
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-size: 0.9rem; color: var(--color-text-muted); }
         .form-group input, .form-group textarea, .form-group select {
             width: 100%;
-            padding: 10px 15px;
+            padding: 12px 15px;
             background-color: var(--color-bg);
             border: 1px solid var(--color-border);
             border-radius: 8px;
             color: var(--color-text);
+            transition: border-color var(--transition-speed);
         }
         .form-group input:focus, .form-group textarea:focus { border-color: var(--color-primary); }
+
+        /* Toggle Switch */
+        .toggle-group { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; margin-top: 10px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid var(--color-border); }
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--color-border); transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: var(--color-text-muted); transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--color-primary); }
+        input:checked + .slider:before { transform: translateX(24px); background-color: var(--color-bg); }
         
         .admin-row {
             display: grid;
-            grid-template-columns: 1fr 60px 20px 60px 1fr auto;
+            grid-template-columns: 2fr 60px 20px 60px 1.5fr auto;
             gap: 10px;
             align-items: center;
             background: var(--color-card);
@@ -760,12 +825,48 @@
             border-radius: 8px;
             border: 1px solid var(--color-border);
         }
+        @media (max-width: 768px) {
+            .admin-row { grid-template-columns: 1fr; text-align: center; }
+            .admin-row > div:nth-child(3) { display: none; } /* Скрыть двоеточие на мобильных */
+        }
         .admin-row input { text-align: center; padding: 5px; }
         
-        .btn-sm { padding: 5px 10px; font-size: 0.8rem; background: var(--color-primary); color: white; border-radius: 5px; }
-        .btn-danger { background: var(--color-danger); }
+        .btn-sm { padding: 8px 15px; font-size: 0.85rem; font-weight: 600; background: var(--color-primary); color: var(--color-bg); border-radius: 8px; transition: opacity 0.3s;}
+        .btn-sm:hover { opacity: 0.8; }
+        .btn-danger { background: var(--color-danger); color: white; }
         
-        .admin-actions { margin-top: 30px; display: flex; gap: 10px; }
+        .admin-actions { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--color-border); display: flex; gap: 10px; flex-wrap: wrap; }
+
+        /* ==========================================================================
+           ЭКРАН ТЕХНИЧЕСКИХ РАБОТ И АНИМАЦИЯ
+           ========================================================================== */
+        .maint-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(9, 9, 11, 0.98); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; color: var(--color-text);
+        }
+        .maint-overlay h1 { font-size: 3rem; color: var(--color-primary); margin-bottom: 10px; font-weight: 800; letter-spacing: -0.04em; }
+        .maint-overlay p { font-size: 1.2rem; color: var(--color-text-muted); }
+        
+        .football-anim-container { margin-bottom: 40px; }
+        .pass-ball { animation: pass-anim 1.5s infinite ease-in-out alternate; }
+        @keyframes pass-anim {
+            0%, 15% { transform: translateX(0); }
+            85%, 100% { transform: translateX(230px); }
+        }
+        
+        .kick-leg-l { animation: kick-l-anim 1.5s infinite ease-in-out alternate; transform-origin: 50px 100px; }
+        @keyframes kick-l-anim {
+            0% { transform: rotate(-40deg); }
+            15%, 100% { transform: rotate(10deg); }
+        }
+        
+        .kick-leg-r { animation: kick-r-anim 1.5s infinite ease-in-out alternate; transform-origin: 50px 100px; }
+        @keyframes kick-r-anim {
+            0%, 85% { transform: rotate(-10deg); }
+            100% { transform: rotate(40deg); }
+        }
 
         /* ==========================================================================
            ФУТЕР
@@ -827,6 +928,34 @@
     </style>
 </head>
 <body>
+
+    <!-- ЭКРАН ТЕХНИЧЕСКИХ РАБОТ -->
+    <div id="maintenance-screen" class="maint-overlay hidden">
+        <div class="football-anim-container">
+            <svg viewBox="0 0 400 150" width="100%" height="150" style="max-width: 400px;">
+                <!-- Футболист 1 -->
+                <g stroke="var(--color-text-muted)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+                    <circle cx="50" cy="40" r="15" fill="var(--color-text-muted)"/>
+                    <line x1="50" y1="55" x2="50" y2="100"/>
+                    <line x1="50" y1="65" x2="30" y2="90"/> <line x1="50" y1="65" x2="70" y2="90"/>
+                    <line x1="50" y1="100" x2="40" y2="140"/>
+                    <line x1="50" y1="100" x2="70" y2="135" class="kick-leg-l"/>
+                </g>
+                <!-- Футболист 2 -->
+                <g stroke="var(--color-text-muted)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none" transform="translate(300, 0)">
+                    <circle cx="50" cy="40" r="15" fill="var(--color-text-muted)"/>
+                    <line x1="50" y1="55" x2="50" y2="100"/>
+                    <line x1="50" y1="65" x2="30" y2="90"/> <line x1="50" y1="65" x2="70" y2="90"/>
+                    <line x1="50" y1="100" x2="60" y2="140"/>
+                    <line x1="50" y1="100" x2="30" y2="135" class="kick-leg-r"/>
+                </g>
+                <!-- Мяч -->
+                <circle cx="85" cy="135" r="12" fill="var(--color-primary)" class="pass-ball"/>
+            </svg>
+        </div>
+        <h1>Ведутся работы</h1>
+        <p>Мы делаем сайт URBAN CUP ещё лучше. Скоро вернёмся!</p>
+    </div>
 
     <!-- НАВИГАЦИЯ -->
     <header>
@@ -996,55 +1125,71 @@
 
         <!-- СЕКЦИЯ 8: АДМИН-ПАНЕЛЬ (СКРЫТАЯ) -->
         <section id="admin" class="view-section hidden container">
-            <h2 class="section-title text-danger">Панель администратора</h2>
+            <h2 class="section-title" style="color: var(--color-primary);">Панель администратора</h2>
             
-            <div class="tabs" id="admin-tabs">
-                <button class="tab-btn active" data-target="admin-matches">Матчи</button>
-                <button class="tab-btn" data-target="admin-players">Игроки</button>
-                <button class="tab-btn" data-target="admin-news">Новости</button>
-                <button class="tab-btn" data-target="admin-settings">Настройки</button>
-            </div>
-
-            <div id="admin-matches" class="admin-tab-content">
-                <h3>Результаты матчей</h3>
-                <div id="admin-matches-list" style="margin-top: 20px;"></div>
-            </div>
-
-            <div id="admin-players" class="admin-tab-content hidden">
-                <h3>Бомбардиры и ассистенты</h3>
-                <div id="admin-players-list" style="margin-top: 20px;"></div>
-            </div>
-
-            <div id="admin-news" class="admin-tab-content hidden">
-                <h3>Добавить новость</h3>
-                <div class="form-group">
-                    <input type="text" id="new-news-title" placeholder="Заголовок">
+            <div class="admin-dashboard">
+                <div class="admin-sidebar" id="admin-tabs">
+                    <button class="tab-btn active" data-target="admin-matches"><i class="ph-bold ph-calendar"></i> Матчи</button>
+                    <button class="tab-btn" data-target="admin-players"><i class="ph-bold ph-users"></i> Игроки</button>
+                    <button class="tab-btn" data-target="admin-news"><i class="ph-bold ph-article"></i> Новости</button>
+                    <button class="tab-btn" data-target="admin-settings"><i class="ph-bold ph-gear"></i> Настройки</button>
                 </div>
-                <div class="form-group">
-                    <textarea id="new-news-text" rows="4" placeholder="Текст новости"></textarea>
-                </div>
-                <button class="btn-primary" onclick="adminAddNews()">Добавить</button>
-                <h3 style="margin-top:30px;">Список новостей</h3>
-                <div id="admin-news-list"></div>
-            </div>
 
-            <div id="admin-settings" class="admin-tab-content hidden">
-                <h3>Настройки турнира</h3>
-                <div class="form-group">
-                    <label>Название турнира</label>
-                    <input type="text" id="set-title">
-                </div>
-                <div class="form-group">
-                    <label>Дата финала (YYYY-MM-DD)</label>
-                    <input type="date" id="set-date">
-                </div>
-                <button class="btn-primary" onclick="adminSaveSettings()">Сохранить настройки</button>
-                
-                <div class="admin-actions">
-                    <button class="btn-primary" onclick="exportData()">Экспорт JSON</button>
-                    <button class="btn-sm btn-danger" onclick="document.getElementById('import-file').click()">Импорт JSON</button>
-                    <input type="file" id="import-file" class="hidden" accept=".json" onchange="importData(event)">
-                    <button class="btn-sm btn-danger" onclick="logoutAdmin()">Выйти из админки</button>
+                <div class="admin-content-area">
+                    <div id="admin-matches" class="admin-tab-content">
+                        <h3 style="margin-bottom: 20px; font-size: 1.5rem;">Результаты матчей</h3>
+                        <div id="admin-matches-list"></div>
+                    </div>
+
+                    <div id="admin-players" class="admin-tab-content hidden">
+                        <h3 style="margin-bottom: 20px; font-size: 1.5rem;">Бомбардиры и ассистенты</h3>
+                        <div id="admin-players-list"></div>
+                    </div>
+
+                    <div id="admin-news" class="admin-tab-content hidden">
+                        <h3 style="margin-bottom: 20px; font-size: 1.5rem;">Добавить новость</h3>
+                        <div class="form-group">
+                            <input type="text" id="new-news-title" placeholder="Заголовок">
+                        </div>
+                        <div class="form-group">
+                            <textarea id="new-news-text" rows="4" placeholder="Текст новости"></textarea>
+                        </div>
+                        <button class="btn-primary" onclick="adminAddNews()">Опубликовать новость</button>
+                        <h3 style="margin-top:40px; margin-bottom: 20px;">Существующие новости</h3>
+                        <div id="admin-news-list"></div>
+                    </div>
+
+                    <div id="admin-settings" class="admin-tab-content hidden">
+                        <h3 style="margin-bottom: 20px; font-size: 1.5rem;">Настройки турнира</h3>
+                        
+                        <div class="form-group toggle-group">
+                            <label class="switch">
+                                <input type="checkbox" id="set-maintenance">
+                                <span class="slider"></span>
+                            </label>
+                            <div>
+                                <strong style="display:block; color:var(--color-primary);">Режим технических работ</strong>
+                                <span style="font-size: 0.8rem; color:var(--color-text-muted);">Закрывает публичный доступ к сайту (показывает экран-заглушку)</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Название турнира</label>
+                            <input type="text" id="set-title">
+                        </div>
+                        <div class="form-group">
+                            <label>Дата финала (YYYY-MM-DD)</label>
+                            <input type="date" id="set-date">
+                        </div>
+                        <button class="btn-primary" onclick="adminSaveSettings()">Сохранить настройки</button>
+                        
+                        <div class="admin-actions">
+                            <button class="btn-primary" onclick="exportData()">Скачать JSON бекап</button>
+                            <button class="btn-sm" style="background:var(--color-bg); border:1px solid var(--color-border);" onclick="document.getElementById('import-file').click()">Восстановить из JSON</button>
+                            <input type="file" id="import-file" class="hidden" accept=".json" onchange="importData(event)">
+                            <button class="btn-sm btn-danger" style="margin-left:auto;" onclick="logoutAdmin()">Выйти из админки</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1108,7 +1253,8 @@
             settings: {
                 title: "URBAN CUP 2025",
                 finalDate: "2025-08-30",
-                mode: "group"
+                mode: "group",
+                maintenance: false
             },
             teams: [
                 { id: "T01", name: "Динамит", group: "A", color: "#e74c3c" },
@@ -1206,6 +1352,23 @@
         }
 
         /* ==========================================================================
+           ОБРАБОТЧИК РЕЖИМА ТЕХНИЧЕСКИХ РАБОТ
+           ========================================================================== */
+        function applyMaintenance() {
+            const screen = document.getElementById('maintenance-screen');
+            if (!screen) return;
+            const isAdminView = window.location.hash === '#admin';
+            
+            if (appData.settings.maintenance && !isAdminView) {
+                screen.classList.remove('hidden');
+                document.body.style.overflow = 'hidden'; // Блокировка скролла
+            } else {
+                screen.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+
+        /* ==========================================================================
            РОУТИНГ И НАВИГАЦИЯ
            ========================================================================== */
         function navigate(hash) {
@@ -1232,6 +1395,8 @@
             if(target === '#stats') renderStats('scorers');
             
             window.scrollTo(0,0);
+            
+            applyMaintenance();
         }
 
         window.addEventListener('hashchange', () => navigate(window.location.hash));
@@ -1688,7 +1853,7 @@
 
             // Игроки
             let playersHtml = appData.players.map((p, i) => `
-                <div class="admin-row" style="grid-template-columns: 2fr 1fr 1fr 1fr auto;">
+                <div class="admin-row" style="grid-template-columns: 2fr 0.8fr 0.8fr 0.8fr auto;">
                     <div>${p.name} <span style="color:#666; font-size:0.8rem;">(${getTeam(p.teamId).name})</span></div>
                     <div><label>Голы</label><input type="number" id="pg-${i}" value="${p.goals}"></div>
                     <div><label>Пасы</label><input type="number" id="pa-${i}" value="${p.assists}"></div>
@@ -1710,6 +1875,7 @@
             // Настройки
             document.getElementById('set-title').value = appData.settings.title;
             document.getElementById('set-date').value = appData.settings.finalDate;
+            document.getElementById('set-maintenance').checked = !!appData.settings.maintenance;
         }
 
         function adminSaveMatch(index) {
@@ -1768,7 +1934,9 @@
         function adminSaveSettings() {
             appData.settings.title = document.getElementById('set-title').value;
             appData.settings.finalDate = document.getElementById('set-date').value;
+            appData.settings.maintenance = document.getElementById('set-maintenance').checked;
             saveData();
+            applyMaintenance(); // Мгновенное применение
             alert('Настройки сохранены');
         }
 
@@ -1824,6 +1992,59 @@
             if(currentStatMode) renderStats(currentStatMode);
             renderSchedule();
             renderTeams();
+            applyMaintenance();
+        }
+
+        window.onload = () => {
+            renderAll();
+            // Если в URL есть hash #admin, пробуем показать модалку логина, но не открываем саму админку без пароля
+            if(window.location.hash === '#admin') {
+                document.getElementById('login-modal').classList.add('open');
+                // Сбрасываем hash чтобы не сломать логику SPA
+                window.history.replaceState(null, null, ' ');
+                navigate('#home');
+            } else {
+                navigate(window.location.hash || '#home');
+            }
+        };
+    </script>
+</body>
+</html>
+            reader.onload = (e) => {
+                try {
+                    appData = JSON.parse(e.target.result);
+                    saveData();
+                    alert("Данные успешно импортированы!");
+                    renderAdmin();
+                } catch(err) {
+                    alert("Ошибка чтения файла JSON");
+                }
+                event.target.value = ''; // Сброс инпута, чтобы можно было загрузить этот же файл повторно
+            };
+            reader.readAsText(file);
+        }
+
+        // Табы админки
+        document.querySelectorAll('#admin-tabs .tab-btn').forEach(btn => {
+            btn.onclick = () => {
+                document.querySelectorAll('#admin-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.add('hidden'));
+                document.getElementById(btn.dataset.target).classList.remove('hidden');
+            }
+        });
+
+        /* ==========================================================================
+           ИНИЦИАЛИЗАЦИЯ
+           ========================================================================== */
+        function renderAll() {
+            renderHome();
+            renderGroups();
+            renderPlayoff();
+            if(currentStatMode) renderStats(currentStatMode);
+            renderSchedule();
+            renderTeams();
+            applyMaintenance();
         }
 
         window.onload = () => {
