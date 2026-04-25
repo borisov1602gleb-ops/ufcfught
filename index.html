@@ -90,28 +90,20 @@
             position: absolute;
             background-size: cover;
             background-position: center;
-            opacity: 0.12;
-            filter: grayscale(1) contrast(150%) blur(8px);
-            mix-blend-mode: screen;
             border-radius: 50%;
-            -webkit-mask-image: radial-gradient(circle at center, black 10%, transparent 60%);
-            mask-image: radial-gradient(circle at center, black 10%, transparent 60%);
-            animation: float-silhouettes 25s infinite alternate ease-in-out;
         }
         [data-theme="light"] .silhouette { mix-blend-mode: multiply; opacity: 0.05; filter: grayscale(1) blur(10px); }
         .player-1 {
-            /* Удар через себя (Bicycle kick) */
-            background-image: url('https://images.unsplash.com/photo-1518605368461-1eb5e10e6a89?q=80&w=800&auto=format&fit=crop');
-            width: 800px; height: 800px; top: -15%; right: -15%;
+            background-image: url('https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=1200&auto=format&fit=crop');
+            width: 100vw; height: 100vh; top: 0; right: 0;
+            border-radius: 0; opacity: 0.1; filter: contrast(120%) blur(3px); mix-blend-mode: screen;
+            mask-image: radial-gradient(circle at top right, black 20%, transparent 80%); -webkit-mask-image: radial-gradient(circle at top right, black 20%, transparent 80%);
         }
         .player-2 {
-            /* Прыжок / Удар головой */
-            background-image: url('https://images.unsplash.com/photo-1551958219-acbc608c6377?q=80&w=800&auto=format&fit=crop');
-            width: 900px; height: 900px; bottom: -20%; left: -20%; animation-delay: -12s;
-        }
-        @keyframes float-silhouettes {
-            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
-            100% { transform: translate(-40px, 50px) scale(1.05) rotate(5deg); }
+            background-image: url('https://images.unsplash.com/photo-1518605368461-1eb5e10e6a89?q=80&w=1200&auto=format&fit=crop');
+            width: 100vw; height: 100vh; bottom: 0; left: 0;
+            border-radius: 0; opacity: 0.05; filter: contrast(120%) blur(5px); mix-blend-mode: screen;
+            mask-image: radial-gradient(circle at bottom left, black 20%, transparent 80%); -webkit-mask-image: radial-gradient(circle at bottom left, black 20%, transparent 80%);
         }
 
         a {
@@ -277,6 +269,7 @@
             margin-top: calc(-1 * var(--header-height) - 20px);
             padding-top: var(--header-height);
             border-bottom: 1px solid var(--color-border);
+            background: linear-gradient(to bottom, rgba(0, 10, 26, 0.4), var(--color-bg)), url('https://images.unsplash.com/photo-1508344928928-7137b29de218?q=80&w=2000&auto=format&fit=crop') center/cover no-repeat;
             overflow: hidden;
         }
 
@@ -285,9 +278,9 @@
             content: '';
             position: absolute;
             top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle at 50% 50%, var(--color-primary) 0%, transparent 30%),
-                        radial-gradient(circle at 80% 20%, var(--color-accent) 0%, transparent 30%);
-            opacity: 0.08;
+            background: radial-gradient(circle at 50% 50%, var(--color-primary) 0%, transparent 25%),
+                        radial-gradient(circle at 80% 20%, var(--color-accent) 0%, transparent 25%);
+            opacity: 0.2;
             z-index: -1;
             animation: rotateGradient 20s linear infinite;
             pointer-events: none;
@@ -358,6 +351,7 @@
             padding: 25px 20px;
             text-align: center;
             box-shadow: var(--shadow-elevation);
+            border-top: 1px solid rgba(255,255,255,0.15);
             transition: border-color var(--transition-speed), transform var(--transition-speed);
         }
 
@@ -414,7 +408,10 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
-            transition: border-color var(--transition-speed);
+            background: var(--color-card-glass);
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.1), var(--shadow-elevation);
+            backdrop-filter: blur(15px);
+            transition: transform var(--transition-speed);
         }
 
         .match-card:hover {
@@ -462,7 +459,7 @@
 
         .team-name.winner {
             color: var(--color-primary);
-            text-shadow: 0 0 10px rgba(204, 255, 0, 0.4);
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
         }
 
         .match-score {
@@ -470,13 +467,14 @@
             text-align: center;
             font-size: 1.4rem;
             font-weight: 900;
-            background: rgba(204, 255, 0, 0.05);
-            color: var(--color-primary);
+            background: rgba(0, 0, 0, 0.6);
+            color: #ffffff;
             padding: 5px 10px;
             border-radius: 8px;
-            border: 1px solid rgba(204, 255, 0, 0.3);
-            box-shadow: inset 0 0 10px rgba(204, 255, 0, 0.1), 0 0 10px rgba(204, 255, 0, 0.1);
-            text-shadow: 0 0 8px rgba(204, 255, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.8);
+            text-shadow: none;
+            letter-spacing: 2px;
         }
 
         .match-score.vs {
@@ -501,15 +499,16 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            border: 1px solid rgba(0, 240, 255, 0.1);
-            border-left: 4px solid var(--color-accent); /* Акцент на электрический синий */
+            background: var(--color-card-glass);
+            border: 1px solid rgba(255, 0, 85, 0.2);
+            border-left: 4px solid var(--color-accent); 
             box-shadow: var(--neon-glow-accent);
         }
 
         .leader-icon {
             width: 50px;
             height: 50px;
-            background-color: rgba(0, 240, 255, 0.1);
+            background-color: rgba(255, 0, 85, 0.1);
             color: var(--color-accent);
             border-radius: 50%;
             display: flex;
@@ -713,13 +712,13 @@
 
         /* Подсветка в группах */
         .group-table tr.qualify td {
-            border-left: 4px solid var(--color-primary);
-            background: rgba(204, 255, 0, 0.02);
+            border-left: 3px solid var(--color-primary);
+            background: linear-gradient(90deg, rgba(0, 240, 255, 0.08) 0%, transparent 100%);
         }
         .group-table tr.qualify td:first-child { 
-            background: rgba(204, 255, 0, 0.05); 
-            color: var(--color-primary); 
-            text-shadow: 0 0 8px rgba(204, 255, 0, 0.3); 
+            color: #ffffff; 
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.5); 
+            font-weight: 800;
         }
         .group-table tr.out td { color: var(--color-text-muted); }
 
@@ -772,13 +771,15 @@
         }
 
         .bracket-match {
-            background-color: var(--color-card);
+            background: var(--color-card-glass);
             border: 1px solid var(--color-border);
-            border-radius: 8px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--border-radius);
             margin: 10px 0;
             position: relative;
             z-index: 2;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.1), var(--shadow-elevation);
+            backdrop-filter: blur(15px);
         }
 
         .bracket-team {
@@ -793,9 +794,9 @@
         
         .bracket-team.winner {
             color: var(--color-primary);
-            background-color: rgba(204, 255, 0, 0.05);
-            text-shadow: 0 0 5px rgba(204, 255, 0, 0.3);
-            border-left: 3px solid var(--color-primary);
+            background-color: rgba(0, 240, 255, 0.05);
+            text-shadow: 0 0 5px rgba(0, 240, 255, 0.3);
+            border-left: 2px solid var(--color-primary);
         }
         
         .bracket-score { font-weight: 800; }
@@ -832,8 +833,9 @@
             padding: 20px;
             text-align: center;
             cursor: pointer;
+            background: var(--color-card-glass);
             transition: all var(--transition-speed);
-            box-shadow: var(--shadow-elevation);
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.1), var(--shadow-elevation);
         }
         .team-card:hover {
             border-color: var(--color-primary);
@@ -843,10 +845,10 @@
         .team-color {
             width: 60px;
             height: 60px;
-            border-radius: 50%;
+            border-radius: 50%; /* Глянцевый 3D шар вместо простой заливки */
             margin: 0 auto 15px;
-            border: 3px solid var(--color-bg);
-            box-shadow: 0 0 0 2px var(--color-border);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: inset -5px -5px 15px rgba(0,0,0,0.5), inset 5px 5px 15px rgba(255,255,255,0.4), var(--shadow-elevation);
         }
 
         .team-card h3 { font-size: 1.2rem; margin-bottom: 5px; }
