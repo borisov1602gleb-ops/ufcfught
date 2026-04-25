@@ -696,6 +696,7 @@
             background: rgba(0,0,0,0.8);
             backdrop-filter: blur(5px);
             z-index: 2000;
+            z-index: 10005;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -816,7 +817,7 @@
         
         .admin-row {
             display: grid;
-            grid-template-columns: 2fr 60px 20px 60px 1.5fr auto;
+            grid-template-columns: 2fr 80px 60px 20px 60px 1.5fr auto;
             gap: 10px;
             align-items: center;
             background: var(--color-card);
@@ -827,7 +828,7 @@
         }
         @media (max-width: 768px) {
             .admin-row { grid-template-columns: 1fr; text-align: center; }
-            .admin-row > div:nth-child(3) { display: none; } /* Скрыть двоеточие на мобильных */
+            .admin-row > div:nth-child(4) { display: none; } /* Скрыть двоеточие на мобильных */
         }
         .admin-row input { text-align: center; padding: 5px; }
         
@@ -1130,6 +1131,12 @@
                 <button class="tab-btn" data-filter="finished">Завершённые</button>
             </div>
 
+            <div style="margin-bottom: 20px;">
+                <select id="schedule-tour-filter" class="search-bar" style="margin-bottom: 0; max-width: 250px;" onchange="renderSchedule(document.querySelector('#schedule-filters .active').dataset.filter)">
+                    <option value="all">Все туры / стадии</option>
+                </select>
+            </div>
+
             <div id="schedule-content">
                 <!-- Генерируется JS -->
             </div>
@@ -1185,7 +1192,7 @@
                         
                         <div class="form-group toggle-group">
                             <label class="switch">
-                                <input type="checkbox" id="set-maintenance">
+                                <input type="checkbox" id="set-maintenance" onchange="toggleMaintenanceMode()">
                                 <span class="slider"></span>
                             </label>
                             <div>
@@ -1406,6 +1413,16 @@
         // Загрузка данных из localStorage или использование дефолтных
         let appData = JSON.parse(localStorage.getItem('urbanCupData')) || JSON.parse(JSON.stringify(mockData));
 
+        // Миграция старых данных: автоматическое вычисление тура (1, 2, 3...)
+        appData.matches.forEach(m => {
+            if (!m.tour) {
+                if (m.stage.length === 1) {
+                    const dates = [...new Set(appData.matches.filter(x => x.stage === m.stage).map(x => x.date))].sort();
+                    m.tour = (dates.indexOf(m.date) + 1).toString();
+                } else { m.tour = m.stage; }
+            }
+        });
+
         function saveData() {
             localStorage.setItem('urbanCupData', JSON.stringify(appData));
             renderAll();
@@ -1480,6 +1497,11 @@
             document.getElementById('login-modal').classList.add('open');
         });
 
+        // Скрытый вход в админку с экрана технических работ (двойной клик по экрану)
+        document.getElementById('maintenance-screen').addEventListener('dblclick', () => {
+            document.getElementById('login-modal').classList.add('open');
+        });
+
         /* ==========================================================================
            ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
            ========================================================================== */
@@ -1519,10 +1541,13 @@
 
             let scoreHTML = m.status === 'finished' ? `<div class="match-score">${m.scoreA}:${m.scoreB}</div>` : `<div class="match-score vs">VS</div>`;
             
+            let stageText = m.stage.length <= 1 ? 'Группа ' + m.stage : m.stage;
+            if (m.tour && m.tour !== m.stage) stageText += ` • Тур ${m.tour}`;
+            
             return `
                 <div class="match-card">
                     <div class="match-header">
-                        <span>${includeDate ? m.date + ' • ' : ''}${m.time} • ${m.field} ${m.stage.length <= 1 ? '(Группа '+m.stage+')' : '('+m.stage+')'}</span>
+                        <span>${includeDate ? m.date + ' • ' : ''}${m.time} • ${m.field} (${stageText})</span>
                         ${statusHTML}
                     </div>
                     <div class="match-teams">
@@ -1783,10 +1808,27 @@
         function renderSchedule(filter = 'all') {
             let matches = [...appData.matches].sort((a,b) => new Date(a.date) - new Date(b.date));
             
+            // Заполнение выпадающего списка туров
+            const tourFilter = document.getElementById('schedule-tour-filter');
+            const selectedTour = tourFilter ? tourFilter.value : 'all';
+            const uniqueTours = [...new Set(appData.matches.map(m => m.tour).filter(Boolean))].sort();
+            
+            if (tourFilter) {
+                let optionsHtml = `<option value="all">Все туры / стадии</option>`;
+                uniqueTours.forEach(t => {
+                    optionsHtml += `<option value="${t}" ${selectedTour === String(t) ? 'selected' : ''}>${t.length <= 1 ? 'Тур ' + t : t}</option>`;
+                });
+                tourFilter.innerHTML = optionsHtml;
+            }
+
             if(filter === 'group') matches = matches.filter(m => m.stage.length === 1);
             if(filter === 'playoff') matches = matches.filter(m => m.stage.length > 1);
             if(filter === 'upcoming') matches = matches.filter(m => m.status !== 'finished');
             if(filter === 'finished') matches = matches.filter(m => m.status === 'finished');
+
+            if (tourFilter && tourFilter.value !== 'all') {
+                matches = matches.filter(m => m.tour == tourFilter.value);
+            }
 
             // Группировка по дате
             const grouped = {};
@@ -1906,7 +1948,8 @@
             let matchesHtml = appData.matches.map((m, i) => {
                 return `
                 <div class="admin-row">
-                    <div>${m.date} | ${getTeam(m.teamA).name} - ${getTeam(m.teamB).name}</div>
+                    <div><div style="font-size:0.8rem;color:var(--color-text-muted)">${m.date}</div>${getTeam(m.teamA).name} - ${getTeam(m.teamB).name}</div>
+                    <input type="text" id="tr-${i}" value="${m.tour || ''}" placeholder="Тур">
                     <input type="number" id="scA-${i}" value="${m.scoreA !== null ? m.scoreA : ''}" placeholder="-">
                     <div style="text-align:center;">:</div>
                     <input type="number" id="scB-${i}" value="${m.scoreB !== null ? m.scoreB : ''}" placeholder="-">
@@ -1949,10 +1992,12 @@
         }
 
         function adminSaveMatch(index) {
+            let tr = document.getElementById(`tr-${index}`).value;
             let scA = document.getElementById(`scA-${index}`).value;
             let scB = document.getElementById(`scB-${index}`).value;
             let st = document.getElementById(`st-${index}`).value;
             
+            appData.matches[index].tour = tr;
             appData.matches[index].scoreA = scA === '' ? null : parseInt(scA);
             appData.matches[index].scoreB = scB === '' ? null : parseInt(scB);
             appData.matches[index].status = st;
@@ -2001,10 +2046,15 @@
             }
         }
 
+        function toggleMaintenanceMode() {
+            appData.settings.maintenance = document.getElementById('set-maintenance').checked;
+            saveData();
+            applyMaintenance();
+        }
+
         function adminSaveSettings() {
             appData.settings.title = document.getElementById('set-title').value;
             appData.settings.finalDate = document.getElementById('set-date').value;
-            appData.settings.maintenance = document.getElementById('set-maintenance').checked;
             saveData();
             applyMaintenance(); // Мгновенное применение
             alert('Настройки сохранены');
@@ -2142,117 +2192,6 @@
             document.getElementById('title-schedule').innerText = appData.settings.titles?.schedule || "Расписание матчей";
             document.getElementById('title-teams').innerText = appData.settings.titles?.teams || "Команды турнира";
 
-            renderHome();
-            renderGroups();
-            renderPlayoff();
-            if(currentStatMode) renderStats(currentStatMode);
-            renderSchedule();
-            renderTeams();
-            applyMaintenance();
-        }
-
-        window.onload = () => {
-            renderAll();
-            // Если в URL есть hash #admin, пробуем показать модалку логина, но не открываем саму админку без пароля
-            if(window.location.hash === '#admin') {
-                document.getElementById('login-modal').classList.add('open');
-                // Сбрасываем hash чтобы не сломать логику SPA
-                window.history.replaceState(null, null, ' ');
-                navigate('#home');
-            } else {
-                navigate(window.location.hash || '#home');
-            }
-        };
-    </script>
-</body>
-</html>
-            reader.onload = (e) => {
-                try {
-                    appData = JSON.parse(e.target.result);
-                    saveData();
-                    alert("Данные успешно импортированы!");
-                    renderAdmin();
-                } catch(err) {
-                    alert("Ошибка чтения файла JSON");
-                }
-                event.target.value = ''; // Сброс инпута, чтобы можно было загрузить этот же файл повторно
-            };
-            reader.readAsText(file);
-        }
-
-        // Табы админки
-        document.querySelectorAll('#admin-tabs .tab-btn').forEach(btn => {
-            btn.onclick = () => {
-                document.querySelectorAll('#admin-tabs .tab-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.add('hidden'));
-                document.getElementById(btn.dataset.target).classList.remove('hidden');
-            }
-        });
-
-        /* ==========================================================================
-           ИНИЦИАЛИЗАЦИЯ
-           ========================================================================== */
-        function renderAll() {
-            renderHome();
-            renderGroups();
-            renderPlayoff();
-            if(currentStatMode) renderStats(currentStatMode);
-            renderSchedule();
-            renderTeams();
-            applyMaintenance();
-        }
-
-        window.onload = () => {
-            renderAll();
-            // Если в URL есть hash #admin, пробуем показать модалку логина, но не открываем саму админку без пароля
-            if(window.location.hash === '#admin') {
-                document.getElementById('login-modal').classList.add('open');
-                // Сбрасываем hash чтобы не сломать логику SPA
-                window.history.replaceState(null, null, ' ');
-                navigate('#home');
-            } else {
-                navigate(window.location.hash || '#home');
-            }
-        };
-    </script>
-</body>
-</html>
-            } else {
-                navigate(window.location.hash || '#home');
-            }
-        };
-    </script>
-</body>
-</html>
-            reader.onload = (e) => {
-                try {
-                    appData = JSON.parse(e.target.result);
-                    saveData();
-                    alert("Данные успешно импортированы!");
-                    renderAdmin();
-                } catch(err) {
-                    alert("Ошибка чтения файла JSON");
-                }
-                event.target.value = ''; // Сброс инпута, чтобы можно было загрузить этот же файл повторно
-            };
-            reader.readAsText(file);
-        }
-
-        // Табы админки
-        document.querySelectorAll('#admin-tabs .tab-btn').forEach(btn => {
-            btn.onclick = () => {
-                document.querySelectorAll('#admin-tabs .tab-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.add('hidden'));
-                document.getElementById(btn.dataset.target).classList.remove('hidden');
-            }
-        });
-
-        /* ==========================================================================
-           ИНИЦИАЛИЗАЦИЯ
-           ========================================================================== */
-        function renderAll() {
             renderHome();
             renderGroups();
             renderPlayoff();
