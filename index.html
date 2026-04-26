@@ -3050,9 +3050,10 @@
         const teamName = document.getElementById('reg-team-name').value.trim();
         document.getElementById('reg-final-msg').innerText = `Ждем команду "${teamName}" на поле! Наш менеджер скоро свяжется с вами.`;
         
-        document.getElementById('reg-step-4').classList.remove('active');
-        document.getElementById('reg-step-5').classList.add('active');
-        document.getElementById('pb-5').classList.add('active');
+        document.getElementById('reg-step-3').classList.remove('active');
+        document.getElementById('reg-step-4').classList.add('active');
+        const pb4 = document.getElementById('pb-4');
+        if (pb4) pb4.classList.add('active');
 
         const tColor = document.getElementById('reg-team-color').value || '#a3e635';
         const teamsList = document.getElementById('reg-teams-list');
@@ -3099,6 +3100,19 @@
             
             teamsCount.innerText = currentTeams;
             if (spotsLeft) spotsLeft.innerText = Math.max(0, maxTeams - currentTeams);
+            
+            const regBtn = document.getElementById('reg-main-btn');
+            if (currentTeams >= maxTeams && regBtn) {
+                regBtn.innerText = 'РЕГИСТРАЦИЯ ЗАКРЫТА';
+                regBtn.style.opacity = '0.5';
+                regBtn.style.pointerEvents = 'none';
+                regBtn.style.animation = 'none';
+            } else if (regBtn) {
+                regBtn.innerText = 'ПОДАТЬ ЗАЯВКУ НА УЧАСТИЕ';
+                regBtn.style.opacity = '1';
+                regBtn.style.pointerEvents = 'auto';
+                regBtn.style.animation = 'pulse 2s infinite';
+            }
             
             teamsList.innerHTML = appData.teams.map(t => `
                 <div class="reg-team-card">
