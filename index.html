@@ -3024,11 +3024,105 @@
             });
         });
 
+    /* ==========================================================================
+       МОДАЛКА И ЛОГИКА РЕГИСТРАЦИИ
+       ========================================================================== */
+    function openRegModal() {
+        document.getElementById('reg-modal').classList.add('open');
+        document.querySelectorAll('.reg-step').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.reg-progress-bar').forEach(b => b.classList.remove('active'));
+        document.getElementById('reg-step-1').classList.add('active');
+        document.getElementById('pb-1').classList.add('active');
+    }
+
+    function nextRegStep(currentStep) {
+        if (currentStep === 2) {
+            const teamName = document.getElementById('reg-team-name').value.trim();
+            const capName = document.getElementById('reg-captain-name').value.trim();
+            const phone = document.getElementById('reg-phone').value.trim();
+            if (!teamName || !capName || !phone) {
+                alert('Пожалуйста, заполните все обязательные поля!');
+                return;
+            }
+        }
+        document.getElementById('reg-step-' + currentStep).classList.remove('active');
+        document.getElementById('reg-step-' + (currentStep + 1)).classList.add('active');
+        document.getElementById('pb-' + (currentStep + 1)).classList.add('active');
+    }
+
+    function prevRegStep(currentStep) {
+        document.getElementById('reg-step-' + currentStep).classList.remove('active');
+        document.getElementById('reg-step-' + (currentStep - 1)).classList.add('active');
+        document.getElementById('pb-' + currentStep).classList.remove('active');
+    }
+
+    function submitRegistration() {
+        const teamName = document.getElementById('reg-team-name').value.trim();
+        document.getElementById('reg-final-msg').innerText = `Ждем команду "${teamName}" на поле! Наш менеджер скоро свяжется с вами.`;
+        
+        document.getElementById('reg-step-4').classList.remove('active');
+        document.getElementById('reg-step-5').classList.add('active');
+        document.getElementById('pb-5').classList.add('active');
+
+        const tColor = document.getElementById('reg-team-color').value || '#a3e635';
+        const teamsList = document.getElementById('reg-teams-list');
+        const teamsCount = document.getElementById('reg-teams-count');
+        
+        if (teamsCount && teamsList) {
+            teamsCount.innerText = parseInt(teamsCount.innerText) + 1;
+            teamsList.innerHTML += `<div class="reg-team-card fade-in"><div style="width:20px;height:20px;border-radius:50%;background:${tColor}; box-shadow: 0 0 5px ${tColor}; border: 1px solid rgba(255,255,255,0.2);"></div><strong>${teamName}</strong></div>`;
+        }
+    }
+
+    function renderRegistrationScreen() {
+        const rmList = document.getElementById('reg-roadmap-list');
+        if(rmList && appData.settings.roadmap) {
+            rmList.innerHTML = appData.settings.roadmap.map(r => `
+                <div class="roadmap-item ${r.status}" style="margin-bottom: 12px;">
+                    <div class="roadmap-icon" style="width:35px; height:35px; font-size:0.9rem;">
+                        ${r.status === 'completed' ? '✓' : (r.status === 'in-progress' ? '⚡' : '⏳')}
+                    </div>
+                    <div class="roadmap-content" style="padding: 12px 18px;">
+                        <div class="roadmap-status" style="font-size:0.75rem;">${r.status === 'completed' ? 'Завершено' : (r.status === 'in-progress' ? 'В процессе' : 'Ожидается')}</div>
+                        <div class="roadmap-text" style="font-size:0.95rem;"><span style="color:var(--color-primary); margin-right:5px;">${r.date}</span> ${r.text}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        const teamsList = document.getElementById('reg-teams-list');
+        const teamsCount = document.getElementById('reg-teams-count');
+        if(teamsList && teamsCount && appData.teams) {
+            teamsCount.innerText = appData.teams.length;
+            teamsList.innerHTML = appData.teams.map(t => `
+                <div class="reg-team-card">
+                    <div style="width:20px; height:20px; border-radius:50%; background:${t.color}; box-shadow: 0 0 5px ${t.color}; border: 1px solid rgba(255,255,255,0.2);"></div>
+                    <strong>${t.name}</strong>
+                </div>
+            `).join('');
+        }
+    }
+
         /* ==========================================================================
            8. АДМИН ПАНЕЛЬ
            ========================================================================== */
-        function checkAdminPassword() {
-            if(document.getElementById('admin-password').value === 'admin2026') {
+        // Функция криптографического хэширования (SHA-256)
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function checkAdminPassword() {
+            const inputPass = document.getElementById('admin-password').value;
+            const hashedInput = await sha256(inputPass);
+            
+            // Это хэш SHA-256 для пароля "admin2026"
+            // Если захотите сменить пароль, нужно будет сгенерировать новый хэш
+            const validHash = '3cb7462bbbd806cf2c78cb1e360980bd537dc7b57c7063cc698dc981ed92049c';
+
+            if(hashedInput === validHash) {
                 closeModal('login-modal');
                 navigate('#admin');
                 renderAdmin();
