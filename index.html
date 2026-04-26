@@ -1472,28 +1472,18 @@
         <div style="max-width: 1000px; width: 100%; margin: 0 auto; text-align: left;">
             <div class="text-center" style="margin-top: 20px; margin-bottom: 50px;">
                 <div class="logo" style="justify-content: center; font-size: 2rem; margin-bottom: 20px;">URBAN<span>CUP</span></div>
-                <h1 style="font-size: 3rem; color: var(--color-text); text-transform: uppercase; letter-spacing: 1px; line-height: 1.2;">Регистрация на <span style="color: var(--color-primary);">турнир</span></h1>
+                <h1 style="font-size: 3rem; color: var(--color-text); text-transform: uppercase; letter-spacing: 1px; line-height: 1.2;">Регистрация на турнир<br><span id="reg-tournament-name" style="color: var(--color-primary);">URBAN CUP</span></h1>
                 <p style="font-size: 1.2rem; color: var(--color-text-muted); margin-bottom: 40px; margin-top: 10px;">Официальный набор команд на новый сезон открыт. Количество мест ограничено!</p>
                 <button class="btn-primary btn-huge" onclick="openRegModal()">ПОДАТЬ ЗАЯВКУ НА УЧАСТИЕ</button>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 50px;">
-                <div style="background: var(--color-card-glass); padding: 30px; border-radius: var(--border-radius); border: 1px solid var(--color-border);">
-                    <h3 style="color: var(--color-primary); margin-bottom: 15px; font-size: 1.5rem;">ℹ️ Информация</h3>
-                    <ul style="list-style: none; color: var(--color-text-muted); line-height: 2;">
-                        <li><strong>Формат:</strong> 5х5 (до 15 человек в заявке)</li>
-                        <li><strong>Длительность:</strong> 2 тайма по 20 минут</li>
-                        <li><strong>Взнос за турнир:</strong> 15 000 ₽ с команды</li>
-                        <li><strong>Призовой фонд:</strong> 100 000 ₽ + Кубок и медали</li>
-                    </ul>
-                </div>
-                <div style="background: var(--color-card-glass); padding: 30px; border-radius: var(--border-radius); border: 1px solid var(--color-border);">
-                    <h3 style="color: var(--color-primary); margin-bottom: 15px; font-size: 1.5rem;">📅 Дорожная карта</h3>
-                    <div id="reg-roadmap-list" class="roadmap" style="transform: scale(0.9); transform-origin: top left; margin-bottom: -20px;"></div>
-                </div>
+            <div style="max-width: 600px; margin: 0 auto 50px; background: var(--color-card-glass); padding: 30px; border-radius: var(--border-radius); border: 1px solid var(--color-border);">
+                <h3 style="color: var(--color-primary); margin-bottom: 25px; font-size: 1.5rem; text-align: center;">📅 Дорожная карта</h3>
+                <div id="reg-roadmap-list" class="roadmap" style="margin-bottom: 0;"></div>
             </div>
 
-            <h2 class="section-title text-center" style="width: 100%;">Зарегистрированные участники (<span id="reg-teams-count">0</span>)</h2>
+            <h2 class="section-title text-center" style="width: 100%; margin-bottom: 10px;">Уже с нами (<span id="reg-teams-count">0</span>/16)</h2>
+            <p class="text-center" style="color: var(--color-text-muted); font-size: 1.1rem; margin-bottom: 30px;">Свободных мест: <span id="reg-spots-left" style="color: var(--color-primary); font-weight: 800; font-size: 1.3rem;">16</span></p>
             <div id="reg-teams-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; margin-bottom: 50px;"></div>
         </div>
     </div>
@@ -3067,14 +3057,23 @@
         const tColor = document.getElementById('reg-team-color').value || '#a3e635';
         const teamsList = document.getElementById('reg-teams-list');
         const teamsCount = document.getElementById('reg-teams-count');
+        const spotsLeft = document.getElementById('reg-spots-left');
         
         if (teamsCount && teamsList) {
             teamsCount.innerText = parseInt(teamsCount.innerText) + 1;
+            if (spotsLeft) {
+                spotsLeft.innerText = Math.max(0, parseInt(spotsLeft.innerText) - 1);
+            }
             teamsList.innerHTML += `<div class="reg-team-card fade-in"><div style="width:20px;height:20px;border-radius:50%;background:${tColor}; box-shadow: 0 0 5px ${tColor}; border: 1px solid rgba(255,255,255,0.2);"></div><strong>${teamName}</strong></div>`;
         }
     }
 
     function renderRegistrationScreen() {
+        const titleEl = document.getElementById('reg-tournament-name');
+        if (titleEl && appData.settings.title) {
+            titleEl.innerText = appData.settings.title;
+        }
+
         const rmList = document.getElementById('reg-roadmap-list');
         if(rmList && appData.settings.roadmap) {
             rmList.innerHTML = appData.settings.roadmap.map(r => `
@@ -3092,8 +3091,15 @@
 
         const teamsList = document.getElementById('reg-teams-list');
         const teamsCount = document.getElementById('reg-teams-count');
+        const spotsLeft = document.getElementById('reg-spots-left');
+
         if(teamsList && teamsCount && appData.teams) {
-            teamsCount.innerText = appData.teams.length;
+            const maxTeams = 16;
+            const currentTeams = appData.teams.length;
+            
+            teamsCount.innerText = currentTeams;
+            if (spotsLeft) spotsLeft.innerText = Math.max(0, maxTeams - currentTeams);
+            
             teamsList.innerHTML = appData.teams.map(t => `
                 <div class="reg-team-card">
                     <div style="width:20px; height:20px; border-radius:50%; background:${t.color}; box-shadow: 0 0 5px ${t.color}; border: 1px solid rgba(255,255,255,0.2);"></div>
