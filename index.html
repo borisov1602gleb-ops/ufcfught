@@ -1130,6 +1130,23 @@
             background: rgba(163, 230, 53, 0.15);
             outline-style: solid !important;
         }
+
+        /* Анимации для визуальной жеребьевки */
+        .draw-team-pill {
+            background: var(--color-card); border: 1px solid var(--color-border); padding: 8px 15px; border-radius: 20px; font-weight: 600; font-size: 0.9rem; transition: all 0.2s ease-out; display: inline-block;
+        }
+        .draw-team-pill.active {
+            background: var(--color-primary); color: var(--color-bg); transform: scale(1.15); border-color: var(--color-primary) !important; box-shadow: 0 0 20px rgba(163, 230, 53, 0.6); z-index: 10; position: relative;
+        }
+        .draw-group {
+            background: var(--color-card-glass); border: 1px solid var(--color-border); border-radius: 12px; padding: 15px; min-height: 250px;
+        }
+        .dg-slot {
+            background: rgba(0,0,0,0.3); border: 1px dashed var(--color-text-muted); border-radius: 8px; padding: 10px; margin-bottom: 10px; text-align: center; font-weight: 600; font-size: 0.9rem; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity: 0; transform: translateY(-20px) scale(0.9);
+        }
+        .dg-slot.filled {
+            opacity: 1; transform: translateY(0) scale(1); border-style: solid; border-width: 2px; background: var(--color-card); box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
 <body>
@@ -1552,6 +1569,30 @@
             <h2 style="margin-bottom: 20px;">Доступ</h2>
             <input type="password" id="admin-password" class="search-bar" placeholder="Введите пароль">
             <button class="btn-primary" onclick="checkAdminPassword()" style="width: 100%;">Войти</button>
+        </div>
+    </div>
+
+    <!-- МОДАЛКА: ПРОЦЕСС ЖЕРЕБЬЕВКИ -->
+    <div class="modal-overlay" id="draw-process-modal">
+        <div class="modal-content" style="max-width: 900px; background: var(--color-bg-alt);">
+            <button class="modal-close" onclick="closeModal('draw-process-modal')" id="draw-close-btn">✖</button>
+            <h2 style="margin-bottom: 20px; text-align: center; color: var(--color-primary); font-size: 2rem; text-transform: uppercase;">Официальная Жеребьевка</h2>
+            
+            <div style="text-align: center; margin-bottom: 20px;">
+                <button class="btn-primary" id="start-draw-btn" onclick="startVisualDraw()">Начать процесс</button>
+                <button class="btn-primary hidden" id="save-draw-btn" onclick="saveVisualDraw()" style="background: var(--color-gold); color: #000;">Применить и Сохранить</button>
+            </div>
+
+            <div id="draw-pot" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 30px; min-height: 80px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 12px; border: 1px dashed var(--color-border);">
+                <!-- Команды генерируются JS -->
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px;" id="draw-groups">
+                <div class="draw-group" id="dg-A"><h3 style="text-align:center; margin-bottom:10px; color: var(--color-text-muted);">Группа A</h3><div class="dg-slots"></div></div>
+                <div class="draw-group" id="dg-B"><h3 style="text-align:center; margin-bottom:10px; color: var(--color-text-muted);">Группа B</h3><div class="dg-slots"></div></div>
+                <div class="draw-group" id="dg-C"><h3 style="text-align:center; margin-bottom:10px; color: var(--color-text-muted);">Группа C</h3><div class="dg-slots"></div></div>
+                <div class="draw-group" id="dg-D"><h3 style="text-align:center; margin-bottom:10px; color: var(--color-text-muted);">Группа D</h3><div class="dg-slots"></div></div>
+            </div>
         </div>
     </div>
 
@@ -2578,25 +2619,90 @@
             alert('Настройки сохранены');
         }
 
+        let visualDrawTeams = [];
+        
+        function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
         function adminRunDraw() {
-            if(!confirm('Внимание! Случайная жеребьевка полностью перераспределит 16 команд по группам A, B, C и D. Продолжить?')) return;
+            document.getElementById('draw-process-modal').classList.add('open');
+            document.getElementById('start-draw-btn').classList.remove('hidden');
+            document.getElementById('save-draw-btn').classList.add('hidden');
+            document.getElementById('draw-close-btn').classList.remove('hidden');
             
-            let teams = [...appData.teams];
-            // Алгоритм Фишера-Йетса для случайного перемешивания команд
-            for (let i = teams.length - 1; i > 0; i--) {
+            ['A', 'B', 'C', 'D'].forEach(g => { document.querySelector(`#dg-${g} .dg-slots`).innerHTML = ''; });
+
+            visualDrawTeams = [...appData.teams];
+            document.getElementById('draw-pot').innerHTML = visualDrawTeams.map(t => `<div class="draw-team-pill" id="pot-team-${t.id}" style="border-color:${t.color}">${t.name}</div>`).join('');
+        }
+
+        async function startVisualDraw() {
+            document.getElementById('start-draw-btn').classList.add('hidden');
+            document.getElementById('draw-close-btn').classList.add('hidden'); // Запрещаем закрывать во время процесса
+            
+            // Перемешиваем массив
+            for (let i = visualDrawTeams.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
-                [teams[i], teams[j]] = [teams[j], teams[i]];
+                [visualDrawTeams[i], visualDrawTeams[j]] = [visualDrawTeams[j], visualDrawTeams[i]];
             }
             
-            // Разделяем на 4 группы
             const groups = ['A', 'B', 'C', 'D'];
-            teams.forEach((t, i) => {
-                t.group = groups[Math.floor(i / 4)];
+            let currentGroupIdx = 0;
+
+            for (let i = 0; i < visualDrawTeams.length; i++) {
+                let t = visualDrawTeams[i];
+                let g = groups[currentGroupIdx];
+                
+                // Имитация перемешивания (подсветка случайных элементов)
+                for(let j=0; j<4; j++) {
+                    // Выбираем случайный ID из еще нераспределенных
+                    let remaining = visualDrawTeams.slice(i);
+                    let randomId = remaining[Math.floor(Math.random() * remaining.length)].id;
+                    let randomPill = document.getElementById(`pot-team-${randomId}`);
+                    if(randomPill) randomPill.classList.add('active');
+                    await sleep(150);
+                    if(randomPill) randomPill.classList.remove('active');
+                }
+
+                // Подсветка выбранной команды
+                let pill = document.getElementById(`pot-team-${t.id}`);
+                if(pill) {
+                    pill.classList.add('active');
+                    await sleep(400);
+                    pill.style.transform = 'scale(0)';
+                    pill.style.opacity = '0';
+                    await sleep(300);
+                    pill.style.display = 'none';
+                }
+
+                // Помещение в группу
+                let slot = document.createElement('div');
+                slot.className = 'dg-slot';
+                slot.style.borderColor = t.color;
+                slot.innerHTML = `<div style="display:flex; align-items:center; justify-content:center; gap:8px;"><div style="width:12px; height:12px; border-radius:50%; background:${t.color};"></div>${t.name}</div>`;
+                document.querySelector(`#dg-${g} .dg-slots`).appendChild(slot);
+                
+                await sleep(50);
+                slot.classList.add('filled');
+                
+                t.newGroup = g;
+                currentGroupIdx = (currentGroupIdx + 1) % 4; // Переход к следующей группе
+                
+                await sleep(400);
+            }
+
+            document.getElementById('save-draw-btn').classList.remove('hidden');
+        }
+
+        function saveVisualDraw() {
+            visualDrawTeams.forEach(t => {
+                let originalTeam = appData.teams.find(x => x.id === t.id);
+                if(originalTeam) originalTeam.group = t.newGroup;
             });
             
-            appData.teams = teams;
             saveData();
-            alert('Жеребьевка успешно проведена!');
+            closeModal('draw-process-modal');
+            alert('Жеребьевка успешно проведена и результаты сохранены!');
+            renderAdmin();
         }
 
         function adminResetMatches() {
