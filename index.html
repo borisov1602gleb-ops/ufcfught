@@ -1,4 +1,1125 @@
-фnks li { margin-bottom: 10px; }
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URBAN CUP 2025 | Открытый футбольный турнир</title>
+    <!-- Подключение шрифтов -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ==========================================================================
+           CSS ПЕРЕМЕННЫЕ И БАЗОВЫЕ НАСТРОЙКИ
+           ========================================================================== */
+        :root {
+            --color-bg: #09090b;
+            --color-bg-alt: #18181b;
+            --color-card: #18181b;
+            --color-card-hover: #27272a;
+            --color-primary: #a3e635; /* Electric lime */
+            --color-primary-hover: #bef264;
+            --color-text: #fafafa;
+            --color-text-muted: #a1a1aa;
+            --color-border: #27272a;
+            --color-gold: #fbbf24;
+            --color-silver: #e4e4e7;
+            --color-bronze: #d97706;
+            --color-danger: #e74c3c;
+            --font-main: 'Inter', sans-serif;
+            --transition-speed: 0.3s;
+            --border-radius: 16px;
+            --header-height: 70px;
+            
+            /* Переменные для полупрозрачных фонов */
+            --color-header-bg: rgba(9, 9, 11, 0.75);
+            --color-card-glass: rgba(24, 24, 27, 0.6);
+            --shadow-elevation: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        /* СВЕТЛАЯ ТЕМА */
+        [data-theme="light"] {
+            --color-bg: #f8fafc;
+            --color-bg-alt: #f1f5f9;
+            --color-card: #ffffff;
+            --color-card-hover: #f8fafc;
+            --color-primary: #0044ff; /* Спортивный синий для светлой темы */
+            --color-primary-hover: #0033cc;
+            --color-accent: #ff4400; 
+            --color-text: #0f172a;
+            --color-text-muted: #64748b;
+            --color-border: #e2e8f0;
+            
+            --color-header-bg: rgba(248, 250, 252, 0.85);
+            --color-card-glass: rgba(255, 255, 255, 0.8);
+            --shadow-elevation: 0 10px 40px rgba(15, 23, 42, 0.08);
+            --neon-glow: 0 5px 15px rgba(0, 68, 255, 0.2);
+            --neon-glow-accent: 0 5px 15px rgba(255, 68, 0, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+
+        /* Фоновые заблюренные силуэты спортсменов */
+        .sports-bg-silhouettes {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: -2;
+            overflow: hidden;
+        }
+        .silhouette {
+            position: absolute;
+            background-size: cover;
+            background-position: center;
+            border-radius: 50%;
+        }
+        [data-theme="light"] .silhouette { mix-blend-mode: multiply; opacity: 0.05; filter: grayscale(1) blur(10px); }
+        .player-1 {
+            background-image: url('https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=1200&auto=format&fit=crop');
+            width: 100vw; height: 100vh; top: 0; right: 0;
+            border-radius: 0; opacity: 0.1; filter: contrast(120%) blur(3px); mix-blend-mode: screen;
+            mask-image: radial-gradient(circle at top right, black 20%, transparent 80%); -webkit-mask-image: radial-gradient(circle at top right, black 20%, transparent 80%);
+        }
+        .player-2 {
+            background-image: url('https://images.unsplash.com/photo-1518605368461-1eb5e10e6a89?q=80&w=1200&auto=format&fit=crop');
+            width: 100vw; height: 100vh; bottom: 0; left: 0;
+            border-radius: 0; opacity: 0.05; filter: contrast(120%) blur(5px); mix-blend-mode: screen;
+            mask-image: radial-gradient(circle at bottom left, black 20%, transparent 80%); -webkit-mask-image: radial-gradient(circle at bottom left, black 20%, transparent 80%);
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button {
+            cursor: pointer;
+            font-family: var(--font-main);
+            border: none;
+            outline: none;
+        }
+
+        input, select, textarea {
+            font-family: var(--font-main);
+        }
+
+        /* Утилиты */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            display: none;
+        }
+
+        .text-center { text-align: center; }
+        .text-primary { color: var(--color-primary); }
+        .hidden { display: none !important; }
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .mt-4 { margin-top: 1rem; }
+        .mb-4 { margin-bottom: 1rem; }
+
+        /* ==========================================================================
+           НАВИГАЦИЯ (HEADER)
+           ========================================================================== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--color-header-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--color-border);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            transition: background-color var(--transition-speed), border-color var(--transition-speed);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: var(--color-text);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            user-select: none;
+        }
+
+        .logo span {
+            color: var(--color-primary);
+            font-weight: 500;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+        }
+
+        .nav-menu li a {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--color-text-muted);
+            transition: all var(--transition-speed);
+            padding: 8px 16px;
+            border-radius: 20px;
+            position: relative;
+        }
+
+        .nav-menu li a:hover,
+        .nav-menu li a.active {
+            color: var(--color-bg);
+            background-color: var(--color-primary);
+        }
+
+        .nav-menu li a.active::after {
+            display: none;
+        }
+
+        .burger-btn {
+            display: none;
+            background: transparent;
+            color: var(--color-text);
+            font-size: 1.5rem;
+            border: none;
+        }
+
+        @media (max-width: 900px) {
+            .nav-menu {
+                position: fixed;
+                top: var(--header-height);
+                right: -100%;
+                width: 250px;
+                height: calc(100vh - var(--header-height));
+                background-color: var(--color-bg-alt);
+                flex-direction: column;
+                padding: 30px 20px;
+                transition: right var(--transition-speed);
+                border-left: 1px solid var(--color-border);
+            }
+            .nav-menu.open {
+                right: 0;
+            }
+            .burger-btn {
+                display: block;
+            }
+        }
+
+        main {
+            padding-top: calc(var(--header-height) + 20px);
+            min-height: calc(100vh - 100px);
+        }
+
+        /* ==========================================================================
+           ГЛАВНАЯ СТРАНИЦА (HOME)
+           ========================================================================== */
+        /* Hero Секция */
+        .hero {
+            position: relative;
+            height: 70vh;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            margin-top: calc(-1 * var(--header-height) - 20px);
+            padding-top: var(--header-height);
+            border-bottom: 1px solid var(--color-border);
+            background: linear-gradient(to bottom, rgba(0, 10, 26, 0.4), var(--color-bg)), url('https://images.unsplash.com/photo-1508344928928-7137b29de218?q=80&w=2000&auto=format&fit=crop') center/cover no-repeat;
+            overflow: hidden;
+        }
+
+        /* Современный Mesh-градиент для фона Hero */
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle at 50% 50%, var(--color-primary) 0%, transparent 25%),
+                        radial-gradient(circle at 80% 20%, var(--color-primary-hover) 0%, transparent 25%);
+            opacity: 0.2;
+            z-index: -1;
+            animation: rotateGradient 20s linear infinite;
+            pointer-events: none;
+        }
+        
+        [data-theme="light"] .hero::before {
+            opacity: 0.08; /* Мягче в светлой теме */
+        }
+
+        @keyframes rotateGradient {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            margin-bottom: 10px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--color-text-muted);
+            margin-bottom: 30px;
+            font-weight: 400;
+            animation: fadeInUp 1s ease-out;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: #000; /* Черный текст на кислотном фоне выглядит агрессивнее */
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            border-radius: 30px;
+            transition: all var(--transition-speed);
+            display: inline-block;
+            text-transform: uppercase;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--color-primary-hover);
+            color: #000;
+            transform: translateY(-3px);
+        }
+
+        /* Статистика */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: -50px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .stat-card {
+            background-color: var(--color-card-glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius);
+            padding: 25px 20px;
+            text-align: center;
+            box-shadow: var(--shadow-elevation);
+            border-top: 1px solid rgba(255,255,255,0.15);
+            transition: border-color var(--transition-speed), transform var(--transition-speed);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--color-primary);
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            line-height: 1;
+            margin-bottom: 5px;
+            letter-spacing: -0.03em;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 3rem; }
+            .hero p { font-size: 1.1rem; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* Блоки главной страницы */
+        .home-blocks {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+            margin-top: 60px;
+            margin-bottom: 60px;
+        }
+
+        @media (max-width: 900px) {
+            .home-blocks { grid-template-columns: 1fr; }
+        }
+
+        /* Карточки матчей */
+        .match-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .match-card {
+            cursor: pointer;
+            background-color: var(--color-card);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            background: var(--color-card-glass);
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.1), var(--shadow-elevation);
+            backdrop-filter: blur(15px);
+            transition: transform var(--transition-speed);
+        }
+
+        .match-card:hover {
+            border-color: var(--color-text-muted);
+        }
+
+        .match-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+        }
+
+        .match-status.live {
+            color: var(--color-primary);
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            text-shadow: 0 0 8px var(--color-primary);
+        }
+
+        .pulse {
+            width: 8px;
+            height: 8px;
+            background-color: var(--color-primary);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        .match-teams {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .team-name {
+            flex: 1;
+            text-align: center;
+        }
+
+        .team-name.winner {
+            color: var(--color-primary);
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+        }
+
+        .match-score {
+            flex: 0 0 80px;
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: 900;
+            background: rgba(0, 0, 0, 0.6);
+            color: #ffffff;
+            padding: 5px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.8);
+            text-shadow: none;
+            letter-spacing: 2px;
+        }
+
+        .match-score.vs {
+            font-size: 1.2rem;
+            color: var(--color-text-muted);
+            border: none;
+            background: transparent;
+            box-shadow: none; text-shadow: none;
+        }
+
+        /* Лидеры (Справа) */
+        .leaders-block {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .leader-card {
+            background-color: var(--color-card);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: var(--color-card-glass);
+            border: 1px solid rgba(255, 0, 85, 0.2);
+            border-left: 4px solid var(--color-accent); 
+            box-shadow: var(--neon-glow-accent);
+        }
+
+        .leader-icon {
+            width: 50px;
+            height: 50px;
+            background-color: rgba(255, 0, 85, 0.1);
+            color: var(--color-accent);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .leader-info h4 {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+            margin-bottom: 3px;
+        }
+
+        .leader-info .name {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .leader-info .stat {
+            font-size: 0.9rem;
+            color: var(--color-primary);
+            font-weight: 600;
+        }
+
+        /* Новости */
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 60px;
+        }
+
+        .news-card {
+            background-color: var(--color-card);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            border: 1px solid var(--color-border);
+            box-shadow: var(--shadow-elevation);
+        }
+
+        .news-date {
+            font-size: 0.8rem;
+            color: var(--color-primary);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .news-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .news-excerpt {
+            color: var(--color-text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+
+        .news-full {
+            display: none;
+            color: var(--color-text);
+            font-size: 0.95rem;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--color-border);
+        }
+
+        .news-full.show { display: block; }
+
+        .btn-link {
+            color: var(--color-primary);
+            background: transparent;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .btn-link:hover { text-decoration: underline; }
+
+        /* ==========================================================================
+           ДОРОЖНАЯ КАРТА (ROADMAP)
+           ========================================================================== */
+        .roadmap-container {
+            margin-bottom: 60px;
+        }
+        .roadmap {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+        }
+        .roadmap::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            bottom: 20px;
+            left: 24px;
+            width: 2px;
+            background: var(--color-border);
+            z-index: 0;
+        }
+        .roadmap-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .roadmap-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--color-card);
+            border: 2px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: var(--color-text-muted);
+            box-shadow: var(--shadow-elevation);
+            transition: all var(--transition-speed);
+        }
+        .roadmap-item.completed .roadmap-icon { background: var(--color-primary); border-color: var(--color-primary); color: var(--color-bg); }
+        .roadmap-item.in-progress .roadmap-icon { background: var(--color-gold); border-color: var(--color-gold); color: var(--color-bg); }
+        .roadmap-content {
+            background: var(--color-card-glass); backdrop-filter: blur(10px); border: 1px solid var(--color-border);
+            padding: 15px 25px; border-radius: var(--border-radius); flex-grow: 1; box-shadow: var(--shadow-elevation);
+            transition: transform var(--transition-speed), border-color var(--transition-speed);
+        }
+        .roadmap-content:hover { transform: translateY(-3px); border-color: var(--color-text-muted); }
+        .roadmap-item.completed .roadmap-content:hover { border-color: var(--color-primary); }
+        .roadmap-item.in-progress .roadmap-content:hover { border-color: var(--color-gold); }
+        .roadmap-status { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 5px; color: var(--color-text-muted); }
+        .roadmap-item.completed .roadmap-status { color: var(--color-primary); }
+        .roadmap-item.in-progress .roadmap-status { color: var(--color-gold); }
+        .roadmap-text { font-size: 1.15rem; font-weight: 700; color: var(--color-text); }
+
+        /* ==========================================================================
+           ТАБЛИЦЫ (ГРУППЫ, БОМБАРДИРЫ)
+           ========================================================================== */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 8px 20px;
+            background-color: transparent;
+            color: var(--color-text-muted);
+            border: 1px solid var(--color-border);
+            border-radius: 20px;
+            font-weight: 500;
+            transition: all var(--transition-speed);
+        }
+
+        .tab-btn:hover, .tab-btn.active {
+            background-color: var(--color-text);
+            border-color: var(--color-text);
+            color: var(--color-bg);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            margin-bottom: 30px;
+            background-color: var(--color-card);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--color-border);
+            box-shadow: var(--shadow-elevation);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 15px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        th {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--color-text-muted);
+            font-weight: 600;
+            background-color: rgba(255,255,255,0.02);
+            white-space: nowrap;
+        }
+
+        td { font-size: 0.95rem; font-weight: 500; }
+
+        tr:last-child td { border-bottom: none; }
+
+        tr:hover td { background-color: rgba(255,255,255,0.02); }
+
+        /* Подсветка в группах */
+        .group-table tr.qualify td {
+            border-left: 3px solid var(--color-primary);
+            background: linear-gradient(90deg, rgba(0, 240, 255, 0.08) 0%, transparent 100%);
+        }
+        .group-table tr.qualify td:first-child { 
+            color: #ffffff; 
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.5); 
+            font-weight: 800;
+        }
+        .group-table tr.out td { color: var(--color-text-muted); }
+
+        /* Подсветка призеров */
+        .stats-table tr.rank-1 td { border-left: 4px solid var(--color-gold); }
+        .stats-table tr.rank-2 td { border-left: 4px solid var(--color-silver); }
+        .stats-table tr.rank-3 td { border-left: 4px solid var(--color-bronze); }
+
+        /* Кликабельное имя игрока */
+        .clickable-player {
+            cursor: pointer;
+            border-bottom: 1px dashed var(--color-text-muted);
+            transition: all var(--transition-speed);
+            font-weight: 700;
+        }
+        .clickable-player:hover { color: var(--color-primary); border-bottom-color: var(--color-primary); }
+
+        /* ==========================================================================
+           РАСПИСАНИЕ (SCHEDULE)
+           ========================================================================== */
+        .schedule-tour-card {
+            background-color: var(--color-card-glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            overflow: hidden;
+            box-shadow: var(--shadow-elevation);
+        }
+        .schedule-tour-header {
+            background-color: rgba(0,0,0,0.2);
+            padding: 15px 20px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--color-primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--color-border);
+            text-align: center;
+        }
+        .schedule-tour-body {
+            padding: 20px 20px 0 20px;
+        }
+        .schedule-date-badge {
+            display: inline-block;
+            background: var(--color-bg);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--color-text-muted);
+            margin-bottom: 15px;
+            border: 1px solid var(--color-border);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .search-bar {
+            width: 100%;
+            max-width: 400px;
+            padding: 12px 20px;
+            background-color: var(--color-card);
+            border: 1px solid var(--color-border);
+            border-radius: 20px;
+            color: var(--color-text);
+            margin-bottom: 20px;
+            outline: none;
+        }
+        .search-bar:focus { border-color: var(--color-primary); }
+
+        /* ==========================================================================
+           СЕТКА ПЛЕЙ-ОФФ (BRACKET)
+           ========================================================================== */
+        .bracket-container {
+            overflow-x: auto;
+            padding: 20px 0;
+        }
+
+        .bracket {
+            display: flex;
+            min-width: 800px;
+            justify-content: space-between;
+        }
+
+        .bracket-round {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 23%;
+            position: relative;
+        }
+
+        .bracket-title {
+            text-align: center;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .bracket-match {
+            background: var(--color-card-glass);
+            border: 1px solid var(--color-border);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--border-radius);
+            margin: 10px 0;
+            position: relative;
+            z-index: 2;
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.1), var(--shadow-elevation);
+            backdrop-filter: blur(15px);
+        }
+
+        .bracket-team {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-bottom: 1px solid var(--color-border);
+        }
+        .bracket-team:last-child { border-bottom: none; }
+        
+        .bracket-team.winner {
+            color: var(--color-primary);
+            background-color: rgba(0, 240, 255, 0.05);
+            text-shadow: 0 0 5px rgba(0, 240, 255, 0.3);
+            border-left: 2px solid var(--color-primary);
+        }
+        
+        .bracket-score { font-weight: 800; }
+
+        /* Линии коннекторы (очень базовая CSS имитация) */
+        .bracket-round:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 0; right: -15%;
+            width: 15%; height: 100%;
+            /* Заглушка для сложных линий */
+        }
+
+        .third-place {
+            margin-top: 40px;
+            width: 23%;
+            align-self: flex-end;
+        }
+        .third-place .bracket-title { color: var(--color-bronze); }
+
+        /* ==========================================================================
+           КАРТОЧКИ КОМАНД И МОДАЛКИ
+           ========================================================================== */
+        .teams-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .team-card {
+            background-color: var(--color-card);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            background: var(--color-card-glass);
+            transition: all var(--transition-speed);
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.1), var(--shadow-elevation);
+        }
+        .team-card:hover {
+            border-color: var(--color-primary);
+            transform: translateY(-5px);
+        }
+
+        .team-color {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%; /* Глянцевый 3D шар вместо простой заливки */
+            margin: 0 auto 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: inset -5px -5px 15px rgba(0,0,0,0.5), inset 5px 5px 15px rgba(255,255,255,0.4), var(--shadow-elevation);
+        }
+
+        .team-card h3 { font-size: 1.2rem; margin-bottom: 5px; }
+        .team-card p { font-size: 0.85rem; color: var(--color-text-muted); }
+
+        /* Модальные окна */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            z-index: 10005;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-speed);
+        }
+        .modal-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: var(--color-bg-alt);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--color-border);
+            padding: 30px;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform var(--transition-speed);
+        }
+        .modal-overlay.open .modal-content { transform: scale(1); }
+
+        .modal-close {
+            position: absolute;
+            top: 20px; right: 20px;
+            background: transparent;
+            color: var(--color-text-muted);
+            font-size: 1.5rem;
+            transition: color var(--transition-speed);
+        }
+        .modal-close:hover { color: var(--color-danger); }
+
+        /* ==========================================================================
+           АДМИН ПАНЕЛЬ
+           ========================================================================== */
+        .admin-dashboard {
+            background: var(--color-bg-alt);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius);
+            display: flex;
+            min-height: 600px;
+            overflow: hidden;
+            box-shadow: var(--shadow-elevation);
+            margin-top: 20px;
+        }
+        @media (max-width: 768px) {
+            .admin-dashboard { flex-direction: column; }
+        }
+
+        .admin-sidebar {
+            width: 250px;
+            background: rgba(0,0,0,0.2);
+            border-right: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+        }
+        @media (max-width: 768px) {
+            .admin-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--color-border); flex-direction: row; flex-wrap: wrap; }
+        }
+
+        .admin-sidebar .tab-btn {
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            text-align: left;
+            padding: 20px 25px;
+            color: var(--color-text-muted);
+            border-left: 3px solid transparent;
+            font-size: 1rem;
+            width: 100%;
+        }
+        @media (max-width: 768px) {
+            .admin-sidebar .tab-btn { width: auto; border-left: none; border-bottom: 3px solid transparent; padding: 15px; }
+        }
+
+        .admin-sidebar .tab-btn.active, .admin-sidebar .tab-btn:hover {
+            background: rgba(163, 230, 53, 0.05);
+            color: var(--color-primary);
+            border-left-color: var(--color-primary);
+        }
+        @media (max-width: 768px) {
+            .admin-sidebar .tab-btn.active { border-left-color: transparent; border-bottom-color: var(--color-primary); }
+        }
+
+        .admin-content-area {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            max-height: 800px;
+        }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 0.9rem; color: var(--color-text-muted); }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: var(--color-bg);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            color: var(--color-text);
+            transition: border-color var(--transition-speed);
+        }
+        .form-group input:focus, .form-group textarea:focus { border-color: var(--color-primary); }
+
+        /* Toggle Switch */
+        .toggle-group { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; margin-top: 10px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid var(--color-border); }
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--color-border); transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: var(--color-text-muted); transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--color-primary); }
+        input:checked + .slider:before { transform: translateX(24px); background-color: var(--color-bg); }
+        
+        .admin-row {
+            display: grid;
+            grid-template-columns: 2fr 80px 60px 20px 60px 1.5fr auto;
+            gap: 10px;
+            align-items: center;
+            background: var(--color-card);
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--color-border);
+        }
+        @media (max-width: 768px) {
+            .admin-row { grid-template-columns: 1fr; text-align: center; }
+            .admin-row > div:nth-child(4) { display: none; } /* Скрыть двоеточие на мобильных */
+        }
+        .admin-row input { text-align: center; padding: 5px; }
+        
+        .btn-sm { padding: 8px 15px; font-size: 0.85rem; font-weight: 600; background: var(--color-primary); color: var(--color-bg); border-radius: 8px; transition: opacity 0.3s;}
+        .btn-sm:hover { opacity: 0.8; }
+        .btn-danger { background: var(--color-danger); color: white; }
+        
+        .admin-actions { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--color-border); display: flex; gap: 10px; flex-wrap: wrap; }
+
+        /* ==========================================================================
+           ЭКРАН ТЕХНИЧЕСКИХ РАБОТ И АНИМАЦИЯ
+           ========================================================================== */
+        .maint-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(9, 9, 11, 0.98); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; color: var(--color-text);
+        }
+        .maint-overlay h1 { font-size: 3rem; color: var(--color-primary); margin-bottom: 10px; font-weight: 800; letter-spacing: -0.04em; }
+        .maint-overlay p { font-size: 1.2rem; color: var(--color-text-muted); }
+        
+        .football-anim-container { margin-bottom: 40px; }
+        .pass-ball { animation: pass-anim 1.5s infinite ease-in-out alternate; }
+        @keyframes pass-anim {
+            0%, 15% { transform: translateX(0); }
+            85%, 100% { transform: translateX(230px); }
+        }
+        
+        .kick-leg-l { animation: kick-l-anim 1.5s infinite ease-in-out alternate; transform-origin: 50px 100px; }
+        @keyframes kick-l-anim {
+            0% { transform: rotate(-40deg); }
+            15%, 100% { transform: rotate(10deg); }
+        }
+        
+        .kick-leg-r { animation: kick-r-anim 1.5s infinite ease-in-out alternate; transform-origin: 50px 100px; }
+        @keyframes kick-r-anim {
+            0%, 85% { transform: rotate(-10deg); }
+            100% { transform: rotate(40deg); }
+        }
+
+        /* Анимация пенальти (для режима жеребьевки) */
+        .penalty-ball { animation: pen-ball-anim 1.5s infinite ease-in; }
+        @keyframes pen-ball-anim {
+            0%, 15% { transform: translate(0, 0); }
+            40%, 100% { transform: translate(250px, -60px); }
+        }
+        .kick-leg-penalty { animation: pen-leg-anim 1.5s infinite ease-in-out; transform-origin: 50px 100px; }
+        @keyframes pen-leg-anim {
+            0% { transform: rotate(-40deg); }
+            15%, 100% { transform: rotate(20deg); }
+        }
+        .gk-jump { animation: gk-anim 1.5s infinite ease-out; transform-origin: 320px 145px; }
+        @keyframes gk-anim {
+            0%, 20% { transform: translate(0, 0) rotate(0deg); }
+            45%, 100% { transform: translate(-10px, 30px) rotate(-40deg); }
+        }
+
+        /* ==========================================================================
+           ФУТЕР
+           ========================================================================== */
+        footer {
+            background-color: var(--color-bg-alt);
+            border-top: 1px solid var(--color-border);
+            padding: 40px 0 20px;
+            margin-top: 60px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .footer-logo { font-size: 1.5rem; font-weight: 900; margin-bottom: 15px; }
+        .footer-logo span { color: var(--color-primary); }
+        
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 10px; }
         .footer-links a { color: var(--color-text-muted); transition: color 0.3s; }
         .footer-links a:hover { color: var(--color-primary); }
 
@@ -679,14 +1800,10 @@
         // Загрузка данных из localStorage или использование дефолтных
         let appData = JSON.parse(localStorage.getItem('urbanCupData')) || JSON.parse(JSON.stringify(mockData));
 
-        // Патчи для совместимости со старыми сохранениями (восстановление недостающих данных)
-        if (!appData.settings) appData.settings = JSON.parse(JSON.stringify(mockData.settings));
-        if (!appData.settings.roadmap) appData.settings.roadmap = JSON.parse(JSON.stringify(mockData.settings.roadmap));
-        if (!appData.settings.titles) appData.settings.titles = JSON.parse(JSON.stringify(mockData.settings.titles));
-        if (appData.settings.drawMode === undefined) appData.settings.drawMode = false;
-        
-        if (!appData.news) appData.news = JSON.parse(JSON.stringify(mockData.news));
-        if (!appData.players) appData.players = JSON.parse(JSON.stringify(mockData.players));
+        // Патч для дорожной карты (если ее не было в старых сохранениях)
+        if (!appData.settings.roadmap) {
+            appData.settings.roadmap = JSON.parse(JSON.stringify(mockData.settings.roadmap));
+        }
 
         // Миграция старых данных: автоматическое вычисление тура (1, 2, 3...)
         appData.matches.forEach(m => {
