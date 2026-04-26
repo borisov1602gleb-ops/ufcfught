@@ -1507,6 +1507,7 @@
                 <li><a href="#stats" class="nav-link">Статистика</a></li>
                 <li><a href="#schedule" class="nav-link">Расписание</a></li>
                 <li><a href="#teams" class="nav-link">Команды</a></li>
+                <li><a href="#media" class="nav-link">Медиа</a></li>
             </ul>
             <button class="burger-btn" id="burger-btn">☰</button>
         </div>
@@ -1669,6 +1670,14 @@
         <section id="teams" class="view-section hidden container">
             <h2 class="section-title" id="title-teams" data-edit-key="settings.titles.teams">Команды турнира</h2>
             <div class="teams-grid" id="teams-grid">
+                <!-- Генерируется JS -->
+            </div>
+        </section>
+
+        <!-- СЕКЦИЯ: МЕДИА -->
+        <section id="media" class="view-section hidden container">
+            <h2 class="section-title" id="title-media" data-edit-key="settings.titles.media">Медиа-галерея</h2>
+            <div id="global-media-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; margin-bottom: 50px;">
                 <!-- Генерируется JS -->
             </div>
         </section>
@@ -2882,10 +2891,13 @@
             const playersA = appData.players.filter(p => p.teamId === m.teamA);
             const playersB = appData.players.filter(p => p.teamId === m.teamB);
             
-            const startersA = playersA.slice(0, 5);
-            const subsA = playersA.slice(5);
-            const startersB = playersB.slice(0, 5);
-            const subsB = playersB.slice(5);
+            let startersA = playersA.filter(p => p.isStarter).slice(0, 8);
+            let subsA = playersA.filter(p => !startersA.includes(p));
+            let startersB = playersB.filter(p => p.isStarter).slice(0, 8);
+            let subsB = playersB.filter(p => !startersB.includes(p));
+            
+            if(startersA.length === 0) { startersA = playersA.slice(0,8); subsA = playersA.slice(8); }
+            if(startersB.length === 0) { startersB = playersB.slice(0,8); subsB = playersB.slice(8); }
             
             const renderPitchPlayers = (players, color) => {
                 return players.map((p, i) => `
@@ -2918,8 +2930,6 @@
                     <button class="tab-btn active" onclick="switchMatchTab('match-info', this)">Место и время</button>
                     <button class="tab-btn" onclick="switchMatchTab('match-lineups', this)">Стартовый состав</button>
                     <button class="tab-btn" onclick="switchMatchTab('match-events', this)">События</button>
-                    <button class="tab-btn" onclick="switchMatchTab('match-media', this)">Медиа</button>
-                    <button class="tab-btn" onclick="switchMatchTab('match-media', this)">Медиа</button>
                 </div>
 
                 <div id="match-info" class="match-tab-content">
@@ -2940,18 +2950,18 @@
                         <div class="pitch-center-dot"></div>
                         <div class="pitch-goal-area-bottom"></div>
                         
-                        <div class="pitch-half" style="flex-direction: column; justify-content: space-around; padding: 10px;">
-                            <div style="display: flex; justify-content: center;">${startersA[0] ? renderPitchPlayers([startersA[0]], tA.color) : ''}</div>
-                            <div style="display: flex; justify-content: space-evenly; width: 100%;">
-                                ${renderPitchPlayers(startersA.slice(1), tA.color)}
-                            </div>
+                        <div class="pitch-half" style="flex-direction: column; justify-content: space-around; padding: 10px 0;">
+                            <div style="display: flex; justify-content: center; width: 100%;">${renderPitchPlayers(startersA.slice(0, 1), tA.color)}</div>
+                            <div style="display: flex; justify-content: space-evenly; width: 100%;">${renderPitchPlayers(startersA.slice(1, 4), tA.color)}</div>
+                            <div style="display: flex; justify-content: space-evenly; width: 100%;">${renderPitchPlayers(startersA.slice(4, 7), tA.color)}</div>
+                            <div style="display: flex; justify-content: space-evenly; width: 100%;">${renderPitchPlayers(startersA.slice(7, 8), tA.color)}</div>
                         </div>
                         
-                        <div class="pitch-half" style="flex-direction: column-reverse; justify-content: space-around; padding: 10px;">
-                            <div style="display: flex; justify-content: center;">${startersB[0] ? renderPitchPlayers([startersB[0]], tB.color) : ''}</div>
-                            <div style="display: flex; justify-content: space-evenly; width: 100%;">
-                                ${renderPitchPlayers(startersB.slice(1), tB.color)}
-                            </div>
+                        <div class="pitch-half" style="flex-direction: column-reverse; justify-content: space-around; padding: 10px 0;">
+                            <div style="display: flex; justify-content: center; width: 100%;">${renderPitchPlayers(startersB.slice(0, 1), tB.color)}</div>
+                            <div style="display: flex; justify-content: space-evenly; width: 100%;">${renderPitchPlayers(startersB.slice(1, 4), tB.color)}</div>
+                            <div style="display: flex; justify-content: space-evenly; width: 100%;">${renderPitchPlayers(startersB.slice(4, 7), tB.color)}</div>
+                            <div style="display: flex; justify-content: space-evenly; width: 100%;">${renderPitchPlayers(startersB.slice(7, 8), tB.color)}</div>
                         </div>
                     </div>
                     
@@ -2974,10 +2984,6 @@
 
                 <div id="match-events" class="match-tab-content hidden">
                     ${generateEventsTimeline(m)}
-                </div>
-
-                <div id="match-media" class="match-tab-content hidden">
-                    ${generateMediaTab(m)}
                 </div>
             `;
             document.getElementById('match-modal-content').innerHTML = html;
@@ -3010,27 +3016,6 @@
             }).join('');
 
             return `<div class="event-timeline" style="padding: 10px;">${timelineHtml}</div>`;
-        }
-
-        function generateMediaTab(match) {
-            let mediaHtml = '';
-            if (match.videoUrl || match.photoUrl) {
-                if (match.videoUrl) {
-                    let embedUrl = match.videoUrl;
-                    if (embedUrl.includes('watch?v=')) embedUrl = embedUrl.replace('watch?v=', 'embed/');
-                    else if (embedUrl.includes('youtu.be/')) embedUrl = embedUrl.replace('youtu.be/', 'youtube.com/embed/');
-
-                    mediaHtml += `<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; margin-bottom: 20px; box-shadow: var(--shadow-elevation);">
-                        <iframe src="${embedUrl}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allowfullscreen></iframe>
-                    </div>`;
-                }
-                if (match.photoUrl) {
-                    mediaHtml += `<a href="${match.photoUrl}" target="_blank" style="display: block; background: var(--color-card); border: 1px solid var(--color-border); padding: 15px; text-align: center; border-radius: 12px; font-weight: bold; color: var(--color-primary); transition: all var(--transition-speed); box-shadow: var(--shadow-elevation);">📸 Смотреть фотоальбом матча</a>`;
-                }
-            } else {
-                mediaHtml = `<div style="text-align:center; padding:40px 20px; color:var(--color-text-muted); background:rgba(0,0,0,0.2); border-radius:12px; border:1px dashed var(--color-border);">${match.status === 'upcoming' ? '🎥 Медиа появятся после окончания матча.' : 'ℹ️ Для этого матча еще не загружены медиафайлы.'}</div>`;
-            }
-            return mediaHtml;
         }
 
         function switchMatchTab(tabId, btn) {
@@ -3268,11 +3253,12 @@
 
             // Игроки
             let playersHtml = appData.players.map((p, i) => `
-                <div class="admin-row" style="grid-template-columns: 2fr 0.8fr 0.8fr 0.8fr auto auto;">
+                <div class="admin-row" style="grid-template-columns: 2fr 0.6fr 0.6fr 0.6fr 60px auto auto;">
                     <div>${p.name} <span style="color:#666; font-size:0.8rem;">(${getTeam(p.teamId).name})</span></div>
                     <div><label>Голы</label><input type="number" id="pg-${i}" value="${p.goals}"></div>
                     <div><label>Пасы</label><input type="number" id="pa-${i}" value="${p.assists}"></div>
                     <div><label>Матчи</label><input type="number" id="pm-${i}" value="${p.matches}"></div>
+                    <div style="text-align:center;"><label title="В старте">Старт</label><input type="checkbox" id="pstart-${i}" ${p.isStarter ? 'checked' : ''} style="width:18px; height:18px; margin-top:5px; cursor:pointer;"></div>
                     <button class="btn-sm" onclick="adminSavePlayer(${i})">Сохранить</button>
                     <button class="btn-sm btn-danger" onclick="adminDeletePlayer(${i})">✖</button>
                 </div>
@@ -3358,6 +3344,7 @@
             appData.players[index].goals = parseInt(document.getElementById(`pg-${index}`).value) || 0;
             appData.players[index].assists = parseInt(document.getElementById(`pa-${index}`).value) || 0;
             appData.players[index].matches = parseInt(document.getElementById(`pm-${index}`).value) || 0;
+            appData.players[index].isStarter = document.getElementById(`pstart-${index}`).checked;
             saveData();
             alert('Статистика игрока обновлена!');
         }
@@ -3378,7 +3365,8 @@
                 teamId: teamId,
                 goals: 0,
                 assists: 0,
-                matches: 0
+                matches: 0,
+                isStarter: false
             });
 
             saveData();
@@ -3669,14 +3657,8 @@
                 const tB = m.teamB ? getTeam(m.teamB) : null;
 
                 const isTargetMatch = ['1/2', '3rd', 'Final'].includes(m.stage);
-
-                const isWinnerA = m.status === 'finished' && m.scoreA > m.scoreB;
-                const isWinnerB = m.status === 'finished' && m.scoreB > m.scoreA;
-                const isLoserA = m.status === 'finished' && m.scoreA < m.scoreB;
-                const isLoserB = m.status === 'finished' && m.scoreB < m.scoreA;
-
-                const isDraggableA = isWinnerA || (m.stage === '1/2' && (isWinnerA || isLoserA));
-                const isDraggableB = isWinnerB || (m.stage === '1/2' && (isWinnerB || isLoserB));
+                const isDraggableA = true;
+                const isDraggableB = true;
 
                 const slotA = tA
                     ? `<div class="admin-bracket-team ${isDraggableA ? 'draggable-team' : ''}" ${isDraggableA ? `draggable="true" ondragstart="dragStart(event, '${tA.id}')"` : ''}>
@@ -3950,6 +3932,8 @@
             document.getElementById('title-stats').innerText = appData.settings.titles?.stats || "Статистика игроков";
             document.getElementById('title-schedule').innerText = appData.settings.titles?.schedule || "Расписание матчей";
             document.getElementById('title-teams').innerText = appData.settings.titles?.teams || "Команды турнира";
+            if (!appData.settings.titles.media) appData.settings.titles.media = "Медиа-галерея";
+            document.getElementById('title-media').innerText = appData.settings.titles.media;
 
             renderHome();
             renderGroups();
@@ -3957,6 +3941,7 @@
             if(currentStatMode) renderStats(currentStatMode);
             renderSchedule();
             renderTeams();
+            renderMedia();
             applyMaintenance();
             applyTheme();
         }
