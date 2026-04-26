@@ -3126,23 +3126,10 @@
         /* ==========================================================================
            8. АДМИН ПАНЕЛЬ
            ========================================================================== */
-        // Функция криптографического хэширования (SHA-256)
-        async function sha256(message) {
-            const msgBuffer = new TextEncoder().encode(message);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
-        async function checkAdminPassword() {
+        function checkAdminPassword() {
             const inputPass = document.getElementById('admin-password').value;
-            const hashedInput = await sha256(inputPass);
-            
-            // Это хэш SHA-256 для пароля "admin2026"
-            // Если захотите сменить пароль, нужно будет сгенерировать новый хэш
-            const validHash = '3cb7462bbbd806cf2c78cb1e360980bd537dc7b57c7063cc698dc981ed92049c';
 
-            if(hashedInput === validHash) {
+            if(inputPass === 'admin2026') {
                 closeModal('login-modal');
                 navigate('#admin');
                 renderAdmin();
@@ -3202,10 +3189,11 @@
 
             // Команды
             let teamsEditHtml = appData.teams.map((t, i) => `
-                <div class="admin-row" style="grid-template-columns: 2fr 100px auto;">
+                <div class="admin-row" style="grid-template-columns: 2fr 100px auto auto;">
                     <div><label>Название</label><input type="text" id="tn-${i}" value="${t.name}"></div>
                     <div><label>Цвет</label><input type="color" id="tc-${i}" value="${t.color}" style="height: 44px; padding: 2px;"></div>
                     <button class="btn-sm" style="align-self: end; margin-bottom: 2px;" onclick="adminSaveTeam(${i})">Сохранить</button>
+                    <button class="btn-sm btn-danger" style="align-self: end; margin-bottom: 2px;" onclick="adminDeleteTeam(${i})">Удалить</button>
                 </div>
             `).join('');
             document.getElementById('admin-manage-teams-list').innerHTML = teamsEditHtml;
@@ -3319,6 +3307,14 @@
             appData.teams[index].color = document.getElementById(`tc-${index}`).value || "#333";
             saveData();
             alert('Данные команды обновлены!');
+        }
+
+        function adminDeleteTeam(index) {
+            if (confirm('Вы уверены, что хотите удалить эту команду? Это действие нельзя отменить.')) {
+                appData.teams.splice(index, 1);
+                saveData();
+                renderAdmin();
+            }
         }
 
         function adminSaveRoadmap(index) {
