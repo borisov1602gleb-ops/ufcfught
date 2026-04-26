@@ -734,6 +734,45 @@
         }
         .clickable-player:hover { color: var(--color-primary); border-bottom-color: var(--color-primary); }
 
+        /* ==========================================================================
+           РАСПИСАНИЕ (SCHEDULE)
+           ========================================================================== */
+        .schedule-tour-card {
+            background-color: var(--color-card-glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            overflow: hidden;
+            box-shadow: var(--shadow-elevation);
+        }
+        .schedule-tour-header {
+            background-color: rgba(0,0,0,0.2);
+            padding: 15px 20px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--color-primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--color-border);
+            text-align: center;
+        }
+        .schedule-tour-body {
+            padding: 20px 20px 0 20px;
+        }
+        .schedule-date-badge {
+            display: inline-block;
+            background: var(--color-bg);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--color-text-muted);
+            margin-bottom: 15px;
+            border: 1px solid var(--color-border);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+        }
+
         .search-bar {
             width: 100%;
             max-width: 400px;
@@ -753,12 +792,16 @@
         .bracket-container {
             overflow-x: auto;
             padding: 20px 0;
+            padding: 20px 0 40px 0;
         }
 
         .bracket {
             display: flex;
             min-width: 800px;
             justify-content: space-between;
+            min-width: 900px;
+            justify-content: center;
+            gap: 40px;
         }
 
         .bracket-round {
@@ -766,15 +809,23 @@
             flex-direction: column;
             justify-content: space-around;
             width: 23%;
+            flex: 1;
             position: relative;
         }
 
         .bracket-title {
             text-align: center;
             font-weight: 700;
+            font-weight: 800;
             color: var(--color-primary);
             margin-bottom: 20px;
+            margin-bottom: 25px;
             text-transform: uppercase;
+            letter-spacing: 1px;
+            background: rgba(163, 230, 53, 0.1);
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid rgba(163, 230, 53, 0.2);
         }
 
         .bracket-match {
@@ -783,10 +834,30 @@
             border-top: 1px solid rgba(255,255,255,0.1);
             border-radius: var(--border-radius);
             margin: 10px 0;
+            border-radius: 12px;
+            margin: 15px 0;
             position: relative;
             z-index: 2;
             box-shadow: inset 0 1px 1px rgba(255,255,255,0.1), var(--shadow-elevation);
             backdrop-filter: blur(15px);
+            transition: transform var(--transition-speed), border-color var(--transition-speed);
+            overflow: hidden;
+            box-shadow: var(--shadow-elevation);
+        }
+        .bracket-match:hover {
+            border-color: var(--color-primary);
+            transform: translateY(-3px);
+        }
+
+        .bracket-match-header {
+            font-size: 0.75rem;
+            text-align: center;
+            padding: 6px;
+            background: rgba(0,0,0,0.4);
+            color: var(--color-text-muted);
+            border-bottom: 1px solid var(--color-border);
+            font-weight: 600;
+            letter-spacing: 1px;
         }
 
         .bracket-team {
@@ -794,8 +865,12 @@
             justify-content: space-between;
             padding: 10px 15px;
             font-size: 0.9rem;
+            align-items: center;
+            padding: 12px 15px;
+            font-size: 0.95rem;
             font-weight: 600;
             border-bottom: 1px solid var(--color-border);
+            transition: background var(--transition-speed);
         }
         .bracket-team:last-child { border-bottom: none; }
         
@@ -804,6 +879,9 @@
             background-color: rgba(0, 240, 255, 0.05);
             text-shadow: 0 0 5px rgba(0, 240, 255, 0.3);
             border-left: 2px solid var(--color-primary);
+            color: var(--color-text);
+            background-color: rgba(163, 230, 53, 0.08);
+            border-left: 3px solid var(--color-primary);
         }
         
         .bracket-score { font-weight: 800; }
@@ -815,12 +893,37 @@
             top: 0; right: -15%;
             width: 15%; height: 100%;
             /* Заглушка для сложных линий */
+        .bracket-score { 
+            font-weight: 800; 
+            background: var(--color-bg);
+            padding: 3px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--color-border);
+            min-width: 32px;
+            text-align: center;
+        }
+        
+        .bracket-team.winner .bracket-score {
+            color: var(--color-primary);
+            border-color: var(--color-primary);
+            box-shadow: 0 0 10px rgba(163, 230, 53, 0.2);
         }
 
         .third-place {
             margin-top: 40px;
             width: 23%;
             align-self: flex-end;
+        /* Стрелочки-коннекторы между этапами */
+        @media (min-width: 900px) {
+            .bracket-round:not(:last-child) .bracket-match::after {
+                content: '→';
+                position: absolute;
+                top: 50%; right: -28px;
+                transform: translateY(-50%);
+                color: var(--color-border);
+                font-size: 1.5rem;
+                font-weight: bold;
+            }
         }
         .third-place .bracket-title { color: var(--color-bronze); }
 
@@ -1389,6 +1492,16 @@
 
             <div style="margin-bottom: 20px;">
                 <select id="schedule-tour-filter" class="search-bar" style="margin-bottom: 0; max-width: 250px;" onchange="renderSchedule(document.querySelector('#schedule-filters .active').dataset.filter)">
+            <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 30px; align-items: center; justify-content: space-between;">
+                <div class="tabs" id="schedule-filters" style="margin-bottom: 0;">
+                    <button class="tab-btn active" data-filter="all">Все</button>
+                    <button class="tab-btn" data-filter="group">Группы</button>
+                    <button class="tab-btn" data-filter="playoff">Плей-офф</button>
+                    <button class="tab-btn" data-filter="upcoming">Предстоящие</button>
+                    <button class="tab-btn" data-filter="finished">Завершённые</button>
+                </div>
+                
+                <select id="schedule-tour-filter" class="search-bar" style="margin-bottom: 0; width: auto; min-width: 200px;" onchange="renderSchedule(document.querySelector('#schedule-filters .active').dataset.filter)">
                     <option value="all">Все туры / стадии</option>
                 </select>
             </div>
@@ -1902,6 +2015,7 @@
         }
 
         function generateMatchHTML(m, includeDate = true) {
+        function generateMatchHTML(m, includeDate = true, includeStage = true) {
             const tA = getTeam(m.teamA);
             const tB = getTeam(m.teamB);
             let statusHTML = '';
@@ -1913,11 +2027,18 @@
             
             let stageText = m.stage.length <= 1 ? 'Группа ' + m.stage : m.stage;
             if (m.tour && m.tour !== m.stage) stageText += ` • Тур ${m.tour}`;
+            let stageText = '';
+            if (includeStage) {
+                let sTxt = m.stage.length <= 1 ? 'Группа ' + m.stage : m.stage;
+                if (m.tour && m.tour !== m.stage) sTxt += ` • Тур ${m.tour}`;
+                stageText = ` (${sTxt})`;
+            }
             
             return `
                 <div class="match-card">
                     <div class="match-header">
                         <span>${includeDate ? m.date + ' • ' : ''}${m.time} • ${m.field} (${stageText})</span>
+                        <span>${includeDate ? m.date + ' • ' : ''}${m.time} • ${m.field}${stageText}</span>
                         ${statusHTML}
                     </div>
                     <div class="match-teams">
@@ -2071,6 +2192,7 @@
                     <h3 style="margin:20px 0;">Матчи группы ${g}</h3>
                     <div class="match-list">
                         ${groupMatches.map(m => generateMatchHTML(m, true)).join('')}
+                        ${groupMatches.map(m => generateMatchHTML(m, true, false)).join('')}
                     </div>
                 </div>`;
             });
@@ -2100,15 +2222,44 @@
                 if(!m) return '';
                 const tA = getTeam(m.teamA);
                 const tB = getTeam(m.teamB);
+                const tA = m.teamA ? getTeam(m.teamA) : null;
+                const tB = m.teamB ? getTeam(m.teamB) : null;
+
+                const nameA = tA ? tA.name : '<span style="color:var(--color-text-muted); font-weight:400;">Определяется</span>';
+                const nameB = tB ? tB.name : '<span style="color:var(--color-text-muted); font-weight:400;">Определяется</span>';
+
+                const colorA = tA ? `<div style="width:12px;height:12px;border-radius:50%;background:${tA.color}; box-shadow: 0 0 5px ${tA.color}"></div>` : `<div style="width:12px;height:12px;border-radius:50%;background:var(--color-border)"></div>`;
+                const colorB = tB ? `<div style="width:12px;height:12px;border-radius:50%;background:${tB.color}; box-shadow: 0 0 5px ${tB.color}"></div>` : `<div style="width:12px;height:12px;border-radius:50%;background:var(--color-border)"></div>`;
+
+                let dateStr = "Время не назначено";
+                if (m.date && m.time) {
+                    let dObj = new Date(m.date);
+                    let formattedDate = isNaN(dObj) ? m.date : dObj.toLocaleDateString('ru-RU', {day: '2-digit', month: '2-digit'});
+                    dateStr = `🕒 ${formattedDate} • ${m.time} | ${m.field || ''}`;
+                }
+
+                let scoreA = m.scoreA !== null ? m.scoreA : '-';
+                let scoreB = m.scoreB !== null ? m.scoreB : '-';
+                
+                let winA = m.scoreA !== null && m.scoreA > m.scoreB ? 'winner' : '';
+                let winB = m.scoreB !== null && m.scoreB > m.scoreA ? 'winner' : '';
+
                 return `
                     <div class="bracket-match">
                         <div class="bracket-team ${m.scoreA > m.scoreB ? 'winner' : ''}">
                             <span>${tA.name}</span>
                             <span class="bracket-score">${m.scoreA !== null ? m.scoreA : '-'}</span>
+                        <div class="bracket-match-header">${dateStr}</div>
+                        <div class="bracket-team ${winA}">
+                            <div style="display:flex; align-items:center; gap:10px;">${colorA} ${nameA}</div>
+                            <span class="bracket-score">${scoreA}</span>
                         </div>
                         <div class="bracket-team ${m.scoreB > m.scoreA ? 'winner' : ''}">
                             <span>${tB.name}</span>
                             <span class="bracket-score">${m.scoreB !== null ? m.scoreB : '-'}</span>
+                        <div class="bracket-team ${winB}">
+                            <div style="display:flex; align-items:center; gap:10px;">${colorB} ${nameB}</div>
+                            <span class="bracket-score">${scoreB}</span>
                         </div>
                     </div>
                 `;
@@ -2126,12 +2277,18 @@
                     </div>
                     <div class="bracket-round">
                         <div class="bracket-title">Финал</div>
+                        <div class="bracket-title" style="color: var(--color-gold); background: rgba(251, 191, 36, 0.1); border-color: rgba(251, 191, 36, 0.3);">Финал</div>
                         ${drawMatch(fi)}
                         <div class="third-place">
                             <div class="bracket-title">Матч за 3-е место</div>
                             ${drawMatch(th)}
                         </div>
                     </div>
+                </div>
+                
+                <div style="max-width: 320px; margin: 40px auto 0;">
+                    <div class="bracket-title" style="color: var(--color-bronze); background: rgba(217, 119, 6, 0.1); border-color: rgba(217, 119, 6, 0.3);">Матч за 3-е место</div>
+                    ${drawMatch(th)}
                 </div>
             `;
         }
@@ -2195,6 +2352,7 @@
             let matches = [...appData.matches].sort((a,b) => new Date(a.date) - new Date(b.date));
             
             // Заполнение выпадающего списка туров
+            // Заполнение выпадающего списка туров на основе всех данных
             const tourFilter = document.getElementById('schedule-tour-filter');
             const selectedTour = tourFilter ? tourFilter.value : 'all';
             const uniqueTours = [...new Set(appData.matches.map(m => m.tour).filter(Boolean))].sort();
@@ -2218,18 +2376,52 @@
 
             // Группировка по дате
             const grouped = {};
+            // Группировка по Туру/Стадии, затем по Дате
+            const groupedByTour = {};
             matches.forEach(m => {
                 if(!grouped[m.date]) grouped[m.date] = [];
                 grouped[m.date].push(m);
+                let tourName = m.stage.length > 1 ? m.stage : (m.tour ? 'Тур ' + m.tour : 'Групповой этап');
+                if(m.stage === '1/4') tourName = '1/4 Финала';
+                if(m.stage === '1/2') tourName = 'Полуфинал';
+                if(m.stage === '3rd') tourName = 'Матч за 3-е место';
+                if(m.stage === 'Final') tourName = 'Финал';
+
+                if(!groupedByTour[tourName]) groupedByTour[tourName] = {};
+
+                let dateObj = new Date(m.date);
+                let dateStr = isNaN(dateObj) ? m.date : dateObj.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' });
+                dateStr = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+
+                if(!groupedByTour[tourName][m.date]) groupedByTour[tourName][m.date] = { displayDate: dateStr, matches: [] };
+                groupedByTour[tourName][m.date].matches.push(m);
             });
 
             let html = '';
             for(const date in grouped) {
                 html += `<h3 style="margin: 30px 0 15px; border-bottom: 1px solid var(--color-border); padding-bottom:10px;">${date}</h3>`;
                 html += `<div class="match-list">${grouped[date].map(m => generateMatchHTML(m, false)).join('')}</div>`;
+            for(const tour in groupedByTour) {
+                html += `
+                    <div class="schedule-tour-card">
+                        <div class="schedule-tour-header">${tour}</div>
+                        <div class="schedule-tour-body">
+                `;
+                
+                const dates = Object.keys(groupedByTour[tour]).sort();
+                dates.forEach(date => {
+                    const dateData = groupedByTour[tour][date];
+                    html += `<div style="margin-bottom: 25px;">`;
+                    html += `<div class="schedule-date-badge">📅 ${dateData.displayDate}</div>`;
+                    html += `<div class="match-list">${dateData.matches.map(m => generateMatchHTML(m, false, false)).join('')}</div>`;
+                    html += `</div>`;
+                });
+                
+                html += `</div></div>`;
             }
 
             document.getElementById('schedule-content').innerHTML = html || '<p>Матчей не найдено</p>';
+            document.getElementById('schedule-content').innerHTML = html || '<div style="text-align:center; padding: 40px; color: var(--color-text-muted); background: var(--color-card); border-radius: var(--border-radius); border: 1px solid var(--color-border);">Матчей не найдено</div>';
         }
 
         document.querySelectorAll('#schedule-filters .tab-btn').forEach(btn => {
