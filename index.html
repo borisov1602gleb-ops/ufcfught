@@ -981,6 +981,68 @@
         }
         .modal-close:hover { color: var(--color-danger); }
 
+        .event-timeline { display: flex; flex-direction: column; gap: 15px; }
+        .event-item { display: flex; align-items: center; gap: 15px; }
+        .event-minute { font-weight: 800; width: 40px; text-align: center; color: var(--color-primary); flex-shrink: 0; }
+        .event-icon { font-size: 1.2rem; }
+        .event-text { flex-grow: 1; }
+        .card-yellow { color: #f1c40f; }
+        .card-red { color: #e74c3c; }
+
+        /* ==========================================================================
+           РЕЖИМ ГРАНД ФИНАЛА (EPIC MODE)
+           ========================================================================== */
+        #final-screen {
+            background: radial-gradient(circle at center, #1a1a24 0%, #000000 100%);
+            overflow-y: auto;
+            justify-content: flex-start;
+            padding: 40px 20px;
+        }
+        .final-header { text-align: center; margin-bottom: 30px; animation: fadeInDown 1s ease-out; }
+        .final-title { font-size: 4rem; color: var(--color-gold); font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; text-shadow: 0 0 30px rgba(251, 191, 36, 0.4); margin-bottom: 10px; }
+        .final-matchup { display: flex; align-items: center; justify-content: center; gap: 30px; font-size: 2.5rem; font-weight: 800; text-transform: uppercase; margin-bottom: 20px; }
+        .final-vs { color: var(--color-danger); font-size: 1.5rem; font-weight: 900; background: rgba(255,0,0,0.1); padding: 10px 20px; border-radius: 12px; }
+        
+        .final-trophy { width: 120px; height: 120px; margin: 0 auto 20px; filter: drop-shadow(0 0 20px rgba(251,191,36,0.6)); animation: pulse 2s infinite; }
+
+        /* Футбольное поле для финала */
+        .pitch-container {
+            width: 100%; max-width: 500px; aspect-ratio: 2/3;
+            background: repeating-linear-gradient(0deg, #166534, #166534 10%, #15803d 10%, #15803d 20%);
+            border: 4px solid rgba(255,255,255,0.7);
+            border-radius: 8px; position: relative; margin: 0 auto;
+            display: flex; flex-direction: column;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 50px rgba(0,0,0,0.5);
+            transform: perspective(1000px) rotateX(5deg);
+        }
+        .pitch-half { flex: 1; position: relative; border-bottom: 3px solid rgba(255,255,255,0.5); display: flex; flex-wrap: wrap; justify-content: space-around; align-content: space-around; padding: 20px;}
+        .pitch-half:last-child { border-bottom: none; }
+        .pitch-center-circle { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100px; height: 100px; border: 3px solid rgba(255,255,255,0.5); border-radius: 50%; z-index: 1;}
+        .pitch-center-dot { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 8px; height: 8px; background: white; border-radius: 50%; z-index: 1;}
+        .pitch-goal-area-top { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 200px; height: 60px; border: 3px solid rgba(255,255,255,0.5); border-top: none; }
+        .pitch-goal-area-bottom { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 200px; height: 60px; border: 3px solid rgba(255,255,255,0.5); border-bottom: none; }
+        
+        .pitch-player-wrap { display: flex; flex-direction: column; align-items: center; z-index: 2; width: 30%; animation: fadeInUp 1s ease-out backwards; }
+        .player-dot { 
+            width: 36px; height: 36px; border-radius: 50%; background: #fff; color: #000; 
+            display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.6); border: 3px solid #000;
+        }
+        .player-name-pitch { 
+            color: white; font-size: 0.75rem; font-weight: 700; text-shadow: 1px 1px 4px black, 0 0 10px black; 
+            margin-top: 6px; text-align: center; width: 120%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        /* Анимация авто-жеребьевки плей-офф */
+        .auto-draw-slot {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: scale(0.9); opacity: 0.5;
+        }
+        .auto-draw-slot.filled {
+            transform: scale(1); opacity: 1;
+            box-shadow: 0 0 20px rgba(163, 230, 53, 0.4);
+        }
+
         /* ==========================================================================
            АДМИН ПАНЕЛЬ
            ========================================================================== */
@@ -1283,6 +1345,10 @@
         ⚽ ВНИМАНИЕ: ВКЛЮЧЕН РЕЖИМ "СКОРО ЖЕРЕБЬЕВКА". ОБЫЧНЫЕ ПОЛЬЗОВАТЕЛИ ВИДЯТ ЗАСТАВКУ.
     </div>
 
+    <div id="admin-final-banner" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; background: var(--color-gold); color: #000; text-align: center; padding: 6px; z-index: 10001; font-weight: 800; font-size: 0.85rem; letter-spacing: 1px;">
+        🏆 ВНИМАНИЕ: ВКЛЮЧЕН РЕЖИМ "ГРАНД ФИНАЛ". ПУБЛИЧНЫЙ ДОСТУП ПЕРЕКРЫТ ЭПИЧНЫМ ЭКРАНОМ ФИНАЛА.
+    </div>
+
     <!-- ЭКРАН ТЕХНИЧЕСКИХ РАБОТ -->
     <div id="maintenance-screen" class="maint-overlay hidden">
         <div class="football-anim-container">
@@ -1342,6 +1408,23 @@
         </div>
         <h1>Скоро жеребьевка</h1>
         <p>Приготовьтесь! Распределение команд по группам начнется с минуты на минуту.</p>
+    </div>
+
+    <!-- ЭКРАН ГРАНД ФИНАЛА -->
+    <div id="final-screen" class="maint-overlay hidden">
+        <div class="final-header">
+            <svg class="final-trophy" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                <path d="M4 22h16"></path>
+                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+            </svg>
+            <div class="final-title">Гранд Финал</div>
+            <div id="final-teams-display" class="final-matchup">Загрузка...</div>
+        </div>
+        <div id="final-pitch-display"></div>
     </div>
 
     <!-- НАВИГАЦИЯ -->
@@ -1567,7 +1650,11 @@
 
                     <div id="admin-playoff-manage" class="admin-tab-content hidden">
                         <h3 style="margin-bottom: 10px; font-size: 1.5rem;">Управление сеткой Плей-офф</h3>
-                        <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 25px;">Перетащите победителей из предыдущего раунда в пустые слоты, чтобы сформировать пары.</p>
+                        <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 15px;">Перетащите победителей из предыдущего раунда в пустые слоты, чтобы сформировать пары.</p>
+                        <div style="background: rgba(163,230,53,0.1); border: 1px solid var(--color-primary); padding: 15px; border-radius: 8px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                            <span style="font-size: 0.9rem; font-weight: 600;">Авто-формирование сетки 1/4 Финала на основе итогов групп</span>
+                            <button class="btn-primary" onclick="startPlayoffAutoDraw()">Сформировать сетку</button>
+                        </div>
                         <div id="admin-bracket-content"></div>
                     </div>
 
@@ -1704,6 +1791,39 @@
         </div>
     </div>
 
+    <!-- МОДАЛКА: РЕДАКТОР СОБЫТИЙ МАТЧА -->
+    <div class="modal-overlay" id="event-editor-modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <button class="modal-close" onclick="closeModal('event-editor-modal')">✖</button>
+            <h2 id="event-editor-title" style="margin-bottom: 20px;">Редактор событий матча</h2>
+            
+            <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; border: 1px solid var(--color-border); margin-bottom: 20px;">
+                <h4 style="margin-bottom: 15px; color: var(--color-primary);">Добавить событие</h4>
+                <div style="display: grid; grid-template-columns: 80px 1fr 1fr 1fr auto; gap: 10px; align-items: end;">
+                    <div class="form-group" style="margin:0;"><label>Мин</label><input type="number" id="event-minute" placeholder="45"></div>
+                    <div class="form-group" style="margin:0;"><label>Команда</label><select id="event-team" onchange="populateEventPlayers(this.value)"></select></div>
+                    <div class="form-group" style="margin:0;"><label>Игрок</label><select id="event-player"></select></div>
+                    <div class="form-group" style="margin:0;"><label>Тип</label>
+                        <select id="event-type" onchange="toggleCardType(this.value)">
+                            <option value="goal">Гол</option>
+                            <option value="card">Карточка</option>
+                        </select>
+                    </div>
+                    <button class="btn-primary" onclick="adminAddEvent()" style="padding: 12px 20px;">+</button>
+                </div>
+                <div id="event-card-type-wrapper" class="form-group hidden" style="margin-top:10px; max-width: 150px;">
+                    <label>Тип карточки</label>
+                    <select id="event-card-type">
+                        <option value="yellow">Желтая</option>
+                        <option value="red">Красная</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="event-editor-list"></div>
+        </div>
+    </div>
+
     <!-- МОДАЛКА: ПРОЦЕСС ЖЕРЕБЬЕВКИ -->
     <div class="modal-overlay" id="draw-process-modal">
         <div class="modal-content" style="max-width: 900px; background: var(--color-bg-alt);">
@@ -1725,6 +1845,20 @@
                 <div class="draw-group" id="dg-C"><h3 style="text-align:center; margin-bottom:10px; color: var(--color-text-muted);">Группа C</h3><div class="dg-slots"></div></div>
                 <div class="draw-group" id="dg-D"><h3 style="text-align:center; margin-bottom:10px; color: var(--color-text-muted);">Группа D</h3><div class="dg-slots"></div></div>
             </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛКА: ПРОЦЕСС ФОРМИРОВАНИЯ ПЛЕЙ-ОФФ -->
+    <div class="modal-overlay" id="playoff-draw-modal">
+        <div class="modal-content" style="max-width: 800px; background: var(--color-bg-alt);">
+            <h2 style="margin-bottom: 20px; text-align: center; color: var(--color-primary); font-size: 1.8rem; text-transform: uppercase;">Формирование 1/4 Финала</h2>
+            <p style="text-align: center; color: var(--color-text-muted); margin-bottom: 30px;">Команды распределяются согласно правилу: 1-е места играют со 2-ми местами соседних групп.</p>
+            
+            <div id="playoff-draw-visual" class="bracket" style="min-width: 100%; flex-wrap: wrap;">
+                <!-- Генерируется JS -->
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;"><button class="btn-primary hidden" id="save-playoff-draw-btn" onclick="savePlayoffAutoDraw()" style="background: var(--color-gold); color: #000;">Применить сетку</button></div>
         </div>
     </div>
 
@@ -1779,6 +1913,7 @@
                 mode: "group",
                 maintenance: false,
                 drawMode: false,
+                finalMode: false,
                 theme: "dark",
                 roadmap: [
                     { status: "completed", date: "15.06", text: "Регистрация команд" },
@@ -1837,7 +1972,7 @@
             ],
             matches: [
                 // Группа A
-                { id: "M01", stage: "A", date: "2025-07-01", time: "18:00", field: "Поле 1", teamA: "T01", teamB: "T02", scoreA: 2, scoreB: 1, status: "finished" },
+                { id: "M01", stage: "A", date: "2025-07-01", time: "18:00", field: "Поле 1", teamA: "T01", teamB: "T02", scoreA: 2, scoreB: 1, status: "finished", events: [ { minute: 25, type: 'goal', teamId: 'T01', playerId: 'P01' }, { minute: 67, type: 'goal', teamId: 'T01', playerId: 'P02' }, { minute: 81, type: 'goal', teamId: 'T02', playerId: 'P04' }, { minute: 88, type: 'card', cardType: 'yellow', teamId: 'T02', playerId: 'P05' } ] },
                 { id: "M02", stage: "A", date: "2025-07-01", time: "19:00", field: "Поле 2", teamA: "T03", teamB: "T04", scoreA: 0, scoreB: 0, status: "finished" },
                 { id: "M03", stage: "A", date: "2025-07-08", time: "18:00", field: "Поле 1", teamA: "T01", teamB: "T03", scoreA: 3, scoreB: 1, status: "finished" },
                 { id: "M04", stage: "A", date: "2025-07-08", time: "19:00", field: "Поле 2", teamA: "T02", teamB: "T04", scoreA: 2, scoreB: 0, status: "finished" },
@@ -1889,6 +2024,7 @@
         if (!appData.settings.roadmap) appData.settings.roadmap = JSON.parse(JSON.stringify(mockData.settings.roadmap));
         if (!appData.settings.titles) appData.settings.titles = JSON.parse(JSON.stringify(mockData.settings.titles));
         if (appData.settings.drawMode === undefined) appData.settings.drawMode = false;
+        if (appData.settings.finalMode === undefined) appData.settings.finalMode = false;
         
         if (!appData.news) appData.news = JSON.parse(JSON.stringify(mockData.news));
         if (!appData.players) appData.players = JSON.parse(JSON.stringify(mockData.players));
@@ -1900,6 +2036,9 @@
                     const dates = [...new Set(appData.matches.filter(x => x.stage === m.stage).map(x => x.date))].sort();
                     m.tour = (dates.indexOf(m.date) + 1).toString();
                 } else { m.tour = m.stage; }
+            }
+            if (!m.events) {
+                m.events = [];
             }
         });
 
@@ -1916,6 +2055,8 @@
             const maintBanner = document.getElementById('admin-maint-banner');
             const drawScreen = document.getElementById('draw-screen');
             const drawBanner = document.getElementById('admin-draw-banner');
+            const finalScreen = document.getElementById('final-screen');
+            const finalBanner = document.getElementById('admin-final-banner');
             const isAdminView = !document.getElementById('admin').classList.contains('hidden');
             
             if (!maintScreen) return;
@@ -1924,9 +2065,19 @@
             maintBanner.classList.add('hidden');
             if(drawScreen) drawScreen.classList.add('hidden');
             if(drawBanner) drawBanner.classList.add('hidden');
+            if(finalScreen) finalScreen.classList.add('hidden');
+            if(finalBanner) finalBanner.classList.add('hidden');
             document.body.style.overflow = '';
             
-            if (appData.settings.maintenance) {
+            if (appData.settings.finalMode) {
+                if (isAdminView) {
+                    if(finalBanner) finalBanner.classList.remove('hidden');
+                } else {
+                    if(finalScreen) finalScreen.classList.remove('hidden');
+                    renderFinalScreen();
+                    document.body.style.overflow = 'hidden';
+                }
+            } else if (appData.settings.maintenance) {
                 if (isAdminView) {
                     maintBanner.classList.remove('hidden');
                 } else {
@@ -2007,6 +2158,11 @@
         document.getElementById('draw-screen').addEventListener('dblclick', () => {
             document.getElementById('login-modal').classList.add('open');
         });
+        
+        // Скрытый вход с экрана финала
+        document.getElementById('final-screen').addEventListener('dblclick', () => {
+            document.getElementById('login-modal').classList.add('open');
+        });
 
         /* ==========================================================================
            ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
@@ -2065,6 +2221,45 @@
                         ${scoreHTML}
                         <div class="team-name ${m.scoreB > m.scoreA ? 'winner' : ''}">${tB.name}</div>
                     </div>
+                </div>
+            `;
+        }
+
+        /* ==========================================================================
+           РЕНДЕР ЭКРАНА ГРАНД ФИНАЛА
+           ========================================================================== */
+        function renderFinalScreen() {
+            const finalMatch = appData.matches.find(m => m.stage === 'Final');
+            const displayTeams = document.getElementById('final-teams-display');
+            const displayPitch = document.getElementById('final-pitch-display');
+            
+            if (!finalMatch || !finalMatch.teamA || !finalMatch.teamB) {
+                displayTeams.innerHTML = "Команды еще не определены";
+                displayPitch.innerHTML = "";
+                return;
+            }
+
+            const tA = getTeam(finalMatch.teamA);
+            const tB = getTeam(finalMatch.teamB);
+            const playersA = appData.players.filter(p => p.teamId === tA.id).slice(0, 7); // берем до 7 игроков для мини-футбола
+            const playersB = appData.players.filter(p => p.teamId === tB.id).slice(0, 7);
+
+            displayTeams.innerHTML = `<span style="color:${tA.color}">${tA.name}</span> <span class="final-vs">VS</span> <span style="color:${tB.color}">${tB.name}</span>`;
+
+            // Генерация игроков на поле
+            const renderPlayers = (players, color) => {
+                return players.map((p, i) => `<div class="pitch-player-wrap" style="animation-delay: ${0.5 + (i * 0.2)}s;"><div class="player-dot" style="border-color:${color}">${p.name.charAt(0)}</div><div class="player-name-pitch">${p.name.split(' ')[0]}</div></div>`).join('');
+            };
+
+            displayPitch.innerHTML = `
+                <div class="pitch-container">
+                    <div class="pitch-goal-area-top"></div>
+                    <div class="pitch-center-circle"></div>
+                    <div class="pitch-center-dot"></div>
+                    <div class="pitch-goal-area-bottom"></div>
+                    
+                    <div class="pitch-half">${renderPlayers(playersA, tA.color)}</div>
+                    <div class="pitch-half" style="flex-direction: row-reverse;">${renderPlayers(playersB, tB.color)}</div>
                 </div>
             `;
         }
@@ -2546,15 +2741,41 @@
                 </div>
 
                 <div id="match-events" class="match-tab-content hidden">
-                    <div style="text-align:center; padding:40px 20px; color:var(--color-text-muted); background:rgba(0,0,0,0.2); border-radius:12px; border:1px dashed var(--color-border);">
-                        ${m.status === 'upcoming' ? '⏱️ Матч еще не начался.<br>События будут доступны во время игры.' : 'ℹ️ Подробная хронология событий (голы, карточки, замены) в данный момент недоступна для этого матча.'}
-                    </div>
+                    ${generateEventsTimeline(m)}
                 </div>
             `;
             document.getElementById('match-modal-content').innerHTML = html;
             document.getElementById('match-modal').classList.add('open');
         }
         
+        function generateEventsTimeline(match) {
+            if (!match.events || match.events.length === 0) {
+                return `<div style="text-align:center; padding:40px 20px; color:var(--color-text-muted); background:rgba(0,0,0,0.2); border-radius:12px; border:1px dashed var(--color-border);">
+                    ${match.status === 'upcoming' ? '⏱️ Матч еще не начался.<br>События будут доступны во время игры.' : 'ℹ️ Хронология событий для этого матча не велась.'}
+                </div>`;
+            }
+
+            const sortedEvents = [...match.events].sort((a, b) => a.minute - b.minute);
+
+            const timelineHtml = sortedEvents.map(event => {
+                const player = appData.players.find(p => p.id === event.playerId);
+                const team = getTeam(event.teamId);
+                let icon = '', text = '';
+
+                if (event.type === 'goal') {
+                    icon = '⚽';
+                    text = `<strong>Гол!</strong> <span class="clickable-player" onclick="openPlayerModal('${player.id}')">${player.name}</span> (${team.name})`;
+                } else if (event.type === 'card') {
+                    icon = event.cardType === 'yellow' ? '<span class="card-yellow">🟨</span>' : '<span class="card-red">🟥</span>';
+                    text = `${event.cardType === 'yellow' ? 'Желтая' : 'Красная'} карточка. <span class="clickable-player" onclick="openPlayerModal('${player.id}')">${player.name}</span> (${team.name})`;
+                }
+
+                return `<div class="event-item"><div class="event-minute">${event.minute}'</div><div class="event-icon">${icon}</div><div class="event-text">${text}</div></div>`;
+            }).join('');
+
+            return `<div class="event-timeline" style="padding: 10px;">${timelineHtml}</div>`;
+        }
+
         function switchMatchTab(tabId, btn) {
             document.querySelectorAll('#match-modal .tab-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
@@ -2649,7 +2870,7 @@
             // Матчи
             let matchesHtml = appData.matches.map((m, i) => {
                 return `
-                <div class="admin-row">
+                <div class="admin-row" style="grid-template-columns: 2fr 80px 60px 20px 60px 1.5fr auto auto;">
                     <div><div style="font-size:0.8rem;color:var(--color-text-muted)">${m.date}</div>${getTeam(m.teamA).name} - ${getTeam(m.teamB).name}</div>
                     <input type="text" id="tr-${i}" value="${m.tour || ''}" placeholder="Тур">
                     <input type="number" id="scA-${i}" value="${m.scoreA !== null ? m.scoreA : ''}" placeholder="-">
@@ -2661,6 +2882,7 @@
                         <option value="finished" ${m.status==='finished'?'selected':''}>Завершён</option>
                     </select>
                     <button class="btn-sm" onclick="adminSaveMatch(${i})">Сохранить</button>
+                    <button class="btn-sm" style="background: var(--color-text-muted); color: var(--color-bg);" onclick="openEventEditor(${i})">События</button>
                 </div>
                 `;
             }).join('');
@@ -2737,6 +2959,7 @@
             document.getElementById('set-maintenance').checked = !!appData.settings.maintenance;
             document.getElementById('set-theme').checked = appData.settings.theme === 'light';
             if(document.getElementById('set-draw')) document.getElementById('set-draw').checked = !!appData.settings.drawMode;
+            if(document.getElementById('set-final')) document.getElementById('set-final').checked = !!appData.settings.finalMode;
             if(document.getElementById('set-show-roadmap')) document.getElementById('set-show-roadmap').checked = !!appData.settings.showRoadmap;
         }
 
@@ -2874,6 +3097,12 @@
             applyMaintenance();
         }
 
+        function toggleFinalMode() {
+            appData.settings.finalMode = document.getElementById('set-final').checked;
+            saveData();
+            applyMaintenance();
+        }
+
         function toggleRoadmapVisibility() {
             appData.settings.showRoadmap = document.getElementById('set-show-roadmap').checked;
             saveData();
@@ -2974,6 +3203,72 @@
         }
 
         /* ==========================================================================
+           АВТО-ЖЕРЕБЬЕВКА ПЛЕЙ-ОФФ ПО ИТОГАМ ГРУПП
+           ========================================================================== */
+        let newPlayoffMatches = [];
+
+        function getSortedGroupTeams(g) {
+            const stats = calculateTeamStats();
+            return Object.values(stats).filter(t => t.group === g).sort((a,b) => {
+                if (b.Pts !== a.Pts) return b.Pts - a.Pts;
+                if (b.GD !== a.GD) return b.GD - a.GD;
+                return b.GF - a.GF;
+            });
+        }
+
+        async function startPlayoffAutoDraw() {
+            const aTeams = getSortedGroupTeams('A'); const bTeams = getSortedGroupTeams('B');
+            const cTeams = getSortedGroupTeams('C'); const dTeams = getSortedGroupTeams('D');
+            
+            if (aTeams.length<2 || bTeams.length<2 || cTeams.length<2 || dTeams.length<2) {
+                alert("Ошибка: В группах недостаточно команд для формирования плей-офф."); return;
+            }
+
+            // Стандартная сетка: A1-B2, C1-D2, B1-A2, D1-C2
+            newPlayoffMatches = [
+                { mId: "M25", tA: aTeams[0], tB: bTeams[1], title: "1/4 Финала - Матч 1" },
+                { mId: "M26", tA: cTeams[0], tB: dTeams[1], title: "1/4 Финала - Матч 2" },
+                { mId: "M27", tA: bTeams[0], tB: aTeams[1], title: "1/4 Финала - Матч 3" },
+                { mId: "M28", tA: dTeams[0], tB: cTeams[1], title: "1/4 Финала - Матч 4" }
+            ];
+
+            document.getElementById('playoff-draw-modal').classList.add('open');
+            const visual = document.getElementById('playoff-draw-visual');
+            visual.innerHTML = newPlayoffMatches.map(m => `
+                <div class="admin-bracket-match auto-draw-slot" id="pd-slot-${m.mId}" style="flex: 1 1 45%; max-width: 48%;">
+                    <div class="bracket-match-header">${m.title}</div>
+                    <div class="admin-bracket-team" style="border-left: 4px solid ${m.tA.color}">${m.tA.name} <span style="font-size:0.7rem; color:#888;">(1 место)</span></div>
+                    <div class="admin-bracket-team" style="border-left: 4px solid ${m.tB.color}">${m.tB.name} <span style="font-size:0.7rem; color:#888;">(2 место)</span></div>
+                </div>
+            `).join('');
+
+            // Анимация появления слотов
+            for (let i = 0; i < newPlayoffMatches.length; i++) {
+                await sleep(600);
+                document.getElementById(`pd-slot-${newPlayoffMatches[i].mId}`).classList.add('filled');
+            }
+            
+            await sleep(500);
+            document.getElementById('save-playoff-draw-btn').classList.remove('hidden');
+        }
+
+        function savePlayoffAutoDraw() {
+            newPlayoffMatches.forEach(nm => {
+                let match = appData.matches.find(m => m.id === nm.mId);
+                if (match) { match.teamA = nm.tA.id; match.teamB = nm.tB.id; }
+            });
+            
+            // Очищаем полуфиналы и финалы при новой жеребьевке четвертьфиналов
+            appData.matches.forEach(m => { if (['1/2', '3rd', 'Final'].includes(m.stage)) { m.teamA = null; m.teamB = null; } });
+            
+            saveData();
+            document.getElementById('playoff-draw-modal').classList.remove('open');
+            document.getElementById('save-playoff-draw-btn').classList.add('hidden');
+            renderAdminPlayoff();
+            alert("Сетка плей-офф успешно сформирована!");
+        }
+
+        /* ==========================================================================
            DRAG & DROP ДЛЯ СЕТКИ ПЛЕЙ-ОФФ
            ========================================================================== */
         
@@ -3065,6 +3360,78 @@
             if (targetSlot === 'A') targetMatch.teamA = teamId; else targetMatch.teamB = teamId;
             saveData();
             renderAdminPlayoff();
+        }
+
+        /* ==========================================================================
+           РЕДАКТОР СОБЫТИЙ МАТЧА
+           ========================================================================== */
+        let currentMatchIndexForEvents = -1;
+
+        function openEventEditor(matchIndex) {
+            currentMatchIndexForEvents = matchIndex;
+            const match = appData.matches[matchIndex];
+            const teamA = getTeam(match.teamA);
+            const teamB = getTeam(match.teamB);
+
+            document.getElementById('event-editor-title').innerText = `События: ${teamA.name} vs ${teamB.name}`;
+            
+            const teamSelect = document.getElementById('event-team');
+            teamSelect.innerHTML = `<option value="${teamA.id}">${teamA.name}</option><option value="${teamB.id}">${teamB.name}</option>`;
+            
+            populateEventPlayers(teamA.id);
+            renderEventEditorList();
+            
+            document.getElementById('event-editor-modal').classList.add('open');
+        }
+
+        function populateEventPlayers(teamId) {
+            const playerSelect = document.getElementById('event-player');
+            if (!playerSelect) return;
+            const players = appData.players.filter(p => p.teamId === teamId);
+            playerSelect.innerHTML = players.map(p => `<option value="${p.id}">${p.name}</option>`).join('') || '<option value="">Нет игроков</option>';
+        }
+
+        function toggleCardType(type) {
+            document.getElementById('event-card-type-wrapper').classList.toggle('hidden', type !== 'card');
+        }
+
+        function renderEventEditorList() {
+            if (currentMatchIndexForEvents === -1) return;
+            const match = appData.matches[currentMatchIndexForEvents];
+            const list = document.getElementById('event-editor-list');
+            
+            if (!match.events || match.events.length === 0) {
+                list.innerHTML = '<p style="text-align:center; color:var(--color-text-muted);">Событий пока нет.</p>';
+                return;
+            }
+            match.events.sort((a, b) => a.minute - b.minute);
+            list.innerHTML = match.events.map((event, index) => {
+                const player = appData.players.find(p => p.id === event.playerId);
+                let eventText = event.type === 'goal' ? `⚽ Гол: ${player ? player.name : ''}` : `${event.cardType === 'yellow' ? '🟨' : '🟥'} Карточка: ${player ? player.name : ''}`;
+                return `<div style="background:var(--color-card); padding:10px 15px; margin-bottom:10px; border:1px solid var(--color-border); border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                    <div><strong>${event.minute}'</strong> - ${eventText}</div>
+                    <button class="btn-sm btn-danger" onclick="adminDeleteEvent(${index})">Удалить</button>
+                </div>`;
+            }).join('');
+        }
+
+        function adminAddEvent() {
+            if (currentMatchIndexForEvents === -1) return;
+            const minute = parseInt(document.getElementById('event-minute').value), teamId = document.getElementById('event-team').value, playerId = document.getElementById('event-player').value, type = document.getElementById('event-type').value;
+            if (isNaN(minute) || !teamId || !playerId) return alert('Пожалуйста, заполните все поля.');
+            const newEvent = { minute, teamId, playerId, type };
+            if (type === 'card') newEvent.cardType = document.getElementById('event-card-type').value;
+            if (type === 'goal') { const p = appData.players.find(pl => pl.id === playerId); if(p) p.goals++; }
+            appData.matches[currentMatchIndexForEvents].events.push(newEvent);
+            saveData(); renderEventEditorList(); document.getElementById('event-minute').value = '';
+        }
+
+        function adminDeleteEvent(eventIndex) {
+            if (currentMatchIndexForEvents === -1 || !confirm('Удалить это событие?')) return;
+            const event = appData.matches[currentMatchIndexForEvents].events[eventIndex];
+            if (event.type === 'goal') { const p = appData.players.find(pl => pl.id === event.playerId); if(p && p.goals > 0) p.goals--; }
+            appData.matches[currentMatchIndexForEvents].events.splice(eventIndex, 1);
+            saveData(); renderEventEditorList();
         }
 
         function adminResetMatches() {
