@@ -792,77 +792,112 @@
            ========================================================================== */
         .bracket-container {
             overflow-x: auto;
-            padding: 20px 0;
+            padding: 20px 0 40px 0;
         }
 
         .bracket {
             display: flex;
-            min-width: 800px;
-            justify-content: space-between;
+            min-width: 900px;
+            justify-content: center;
+            gap: 40px;
         }
 
         .bracket-round {
             display: flex;
             flex-direction: column;
             justify-content: space-around;
-            width: 23%;
+            flex: 1;
             position: relative;
         }
 
         .bracket-title {
             text-align: center;
-            font-weight: 700;
+            font-weight: 800;
             color: var(--color-primary);
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             text-transform: uppercase;
+            letter-spacing: 1px;
+            background: rgba(163, 230, 53, 0.1);
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid rgba(163, 230, 53, 0.2);
         }
 
         .bracket-match {
             background: var(--color-card-glass);
             border: 1px solid var(--color-border);
-            border-top: 1px solid rgba(255,255,255,0.1);
-            border-radius: var(--border-radius);
-            margin: 10px 0;
+            border-radius: 12px;
+            margin: 15px 0;
             position: relative;
             z-index: 2;
-            box-shadow: inset 0 1px 1px rgba(255,255,255,0.1), var(--shadow-elevation);
             backdrop-filter: blur(15px);
+            transition: transform var(--transition-speed), border-color var(--transition-speed);
+            overflow: hidden;
+            box-shadow: var(--shadow-elevation);
+            cursor: pointer;
+        }
+        .bracket-match:hover {
+            border-color: var(--color-primary);
+            transform: translateY(-3px);
+        }
+
+        .bracket-match-header {
+            font-size: 0.75rem;
+            text-align: center;
+            padding: 6px;
+            background: rgba(0,0,0,0.4);
+            color: var(--color-text-muted);
+            border-bottom: 1px solid var(--color-border);
+            font-weight: 600;
+            letter-spacing: 1px;
         }
 
         .bracket-team {
             display: flex;
             justify-content: space-between;
-            padding: 10px 15px;
-            font-size: 0.9rem;
+            align-items: center;
+            padding: 12px 15px;
+            font-size: 0.95rem;
             font-weight: 600;
             border-bottom: 1px solid var(--color-border);
+            transition: background var(--transition-speed);
         }
         .bracket-team:last-child { border-bottom: none; }
         
         .bracket-team.winner {
-            color: var(--color-primary);
-            background-color: rgba(0, 240, 255, 0.05);
-            text-shadow: 0 0 5px rgba(0, 240, 255, 0.3);
-            border-left: 2px solid var(--color-primary);
+            color: var(--color-text);
+            background-color: rgba(163, 230, 53, 0.08);
+            border-left: 3px solid var(--color-primary);
         }
         
-        .bracket-score { font-weight: 800; }
-
-        /* Линии коннекторы (очень базовая CSS имитация) */
-        .bracket-round:not(:last-child)::after {
-            content: '';
-            position: absolute;
-            top: 0; right: -15%;
-            width: 15%; height: 100%;
-            /* Заглушка для сложных линий */
+        .bracket-score { 
+            font-weight: 800; 
+            background: var(--color-bg);
+            padding: 3px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--color-border);
+            min-width: 32px;
+            text-align: center;
+        }
+        
+        .bracket-team.winner .bracket-score {
+            color: var(--color-primary);
+            border-color: var(--color-primary);
+            box-shadow: 0 0 10px rgba(163, 230, 53, 0.2);
         }
 
-        .third-place {
-            margin-top: 40px;
-            width: 23%;
-            align-self: flex-end;
+        /* Стрелочки-коннекторы между этапами */
+        @media (min-width: 900px) {
+            .bracket-round:not(:last-child) .bracket-match::after {
+                content: '→';
+                position: absolute;
+                top: 50%; right: -28px;
+                transform: translateY(-50%);
+                color: var(--color-border);
+                font-size: 1.5rem;
+                font-weight: bold;
+            }
         }
-        .third-place .bracket-title { color: var(--color-bronze); }
 
         /* ==========================================================================
            КАРТОЧКИ КОМАНД И МОДАЛКИ
@@ -1800,10 +1835,14 @@
         // Загрузка данных из localStorage или использование дефолтных
         let appData = JSON.parse(localStorage.getItem('urbanCupData')) || JSON.parse(JSON.stringify(mockData));
 
-        // Патч для дорожной карты (если ее не было в старых сохранениях)
-        if (!appData.settings.roadmap) {
-            appData.settings.roadmap = JSON.parse(JSON.stringify(mockData.settings.roadmap));
-        }
+        // Патчи для совместимости со старыми сохранениями (восстановление недостающих данных)
+        if (!appData.settings) appData.settings = JSON.parse(JSON.stringify(mockData.settings));
+        if (!appData.settings.roadmap) appData.settings.roadmap = JSON.parse(JSON.stringify(mockData.settings.roadmap));
+        if (!appData.settings.titles) appData.settings.titles = JSON.parse(JSON.stringify(mockData.settings.titles));
+        if (appData.settings.drawMode === undefined) appData.settings.drawMode = false;
+        
+        if (!appData.news) appData.news = JSON.parse(JSON.stringify(mockData.news));
+        if (!appData.players) appData.players = JSON.parse(JSON.stringify(mockData.players));
 
         // Миграция старых данных: автоматическое вычисление тура (1, 2, 3...)
         appData.matches.forEach(m => {
@@ -2150,17 +2189,38 @@
 
             function drawMatch(m) {
                 if(!m) return '';
-                const tA = getTeam(m.teamA);
-                const tB = getTeam(m.teamB);
+                const tA = m.teamA ? getTeam(m.teamA) : null;
+                const tB = m.teamB ? getTeam(m.teamB) : null;
+
+                const nameA = tA ? tA.name : '<span style="color:var(--color-text-muted); font-weight:400;">Определяется</span>';
+                const nameB = tB ? tB.name : '<span style="color:var(--color-text-muted); font-weight:400;">Определяется</span>';
+
+                const colorA = tA ? `<div style="width:12px;height:12px;border-radius:50%;background:${tA.color}; box-shadow: 0 0 5px ${tA.color}"></div>` : `<div style="width:12px;height:12px;border-radius:50%;background:var(--color-border)"></div>`;
+                const colorB = tB ? `<div style="width:12px;height:12px;border-radius:50%;background:${tB.color}; box-shadow: 0 0 5px ${tB.color}"></div>` : `<div style="width:12px;height:12px;border-radius:50%;background:var(--color-border)"></div>`;
+
+                let dateStr = "Время не назначено";
+                if (m.date && m.time) {
+                    let dObj = new Date(m.date);
+                    let formattedDate = isNaN(dObj) ? m.date : dObj.toLocaleDateString('ru-RU', {day: '2-digit', month: '2-digit'});
+                    dateStr = `🕒 ${formattedDate} • ${m.time} | ${m.field || ''}`;
+                }
+
+                let scoreA = m.scoreA !== null ? m.scoreA : '-';
+                let scoreB = m.scoreB !== null ? m.scoreB : '-';
+                
+                let winA = m.scoreA !== null && m.scoreA > m.scoreB ? 'winner' : '';
+                let winB = m.scoreB !== null && m.scoreB > m.scoreA ? 'winner' : '';
+
                 return `
-                    <div class="bracket-match">
-                        <div class="bracket-team ${m.scoreA > m.scoreB ? 'winner' : ''}">
-                            <span>${tA.name}</span>
-                            <span class="bracket-score">${m.scoreA !== null ? m.scoreA : '-'}</span>
+                    <div class="bracket-match" onclick="openMatchModal('${m.id}')">
+                        <div class="bracket-match-header">${dateStr}</div>
+                        <div class="bracket-team ${winA}">
+                            <div style="display:flex; align-items:center; gap:10px;">${colorA} ${nameA}</div>
+                            <span class="bracket-score">${scoreA}</span>
                         </div>
-                        <div class="bracket-team ${m.scoreB > m.scoreA ? 'winner' : ''}">
-                            <span>${tB.name}</span>
-                            <span class="bracket-score">${m.scoreB !== null ? m.scoreB : '-'}</span>
+                        <div class="bracket-team ${winB}">
+                            <div style="display:flex; align-items:center; gap:10px;">${colorB} ${nameB}</div>
+                            <span class="bracket-score">${scoreB}</span>
                         </div>
                     </div>
                 `;
@@ -2177,13 +2237,14 @@
                         ${sf.map(m => drawMatch(m)).join('')}
                     </div>
                     <div class="bracket-round">
-                        <div class="bracket-title">Финал</div>
+                        <div class="bracket-title" style="color: var(--color-gold); background: rgba(251, 191, 36, 0.1); border-color: rgba(251, 191, 36, 0.3);">Финал</div>
                         ${drawMatch(fi)}
-                        <div class="third-place">
-                            <div class="bracket-title">Матч за 3-е место</div>
-                            ${drawMatch(th)}
-                        </div>
                     </div>
+                </div>
+                
+                <div style="max-width: 320px; margin: 40px auto 0;">
+                    <div class="bracket-title" style="color: var(--color-bronze); background: rgba(217, 119, 6, 0.1); border-color: rgba(217, 119, 6, 0.3);">Матч за 3-е место</div>
+                    ${drawMatch(th)}
                 </div>
             `;
         }
