@@ -1063,7 +1063,6 @@
         }
 
         /* Стили для Режима Регистрации */
-        .reg-overlay { display: block; overflow-y: auto; padding: 60px 20px 40px; text-align: center; }
         .btn-huge { font-size: 1.3rem; padding: 20px 40px; border-radius: 50px; box-shadow: 0 10px 30px rgba(163, 230, 53, 0.4); animation: pulse 2s infinite; letter-spacing: 1px; }
         .reg-step { display: none; animation: fadeInRight 0.4s ease-out; }
         .reg-step.active { display: block; }
@@ -1193,6 +1192,13 @@
         }
         .maint-overlay h1 { font-size: 3rem; color: var(--color-primary); margin-bottom: 10px; font-weight: 800; letter-spacing: -0.04em; }
         .maint-overlay p { font-size: 1.2rem; color: var(--color-text-muted); }
+        
+        /* Фикс экрана регистрации (переопределение центровки) */
+        .maint-overlay.reg-overlay {
+            display: block;
+            padding: 60px 20px 40px;
+            overflow-y: auto;
+        }
         
         .football-anim-container { margin-bottom: 40px; }
         .pass-ball { animation: pass-anim 1.5s infinite ease-in-out alternate; }
@@ -1893,6 +1899,23 @@
             </div>
 
             <div id="event-editor-list"></div>
+        </div>
+    </div>
+
+    <!-- МОДАЛКА: МЕДИА МАТЧА (АДМИН) -->
+    <div class="modal-overlay" id="media-editor-modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <button class="modal-close" onclick="closeModal('media-editor-modal')">✖</button>
+            <h2 id="media-editor-title" style="margin-bottom: 20px;">Медиа матча</h2>
+            <div class="form-group">
+                <label>Ссылка на видео (YouTube / VK)</label>
+                <input type="text" id="match-video-url" placeholder="https://www.youtube.com/watch?v=...">
+            </div>
+            <div class="form-group">
+                <label>Ссылка на фотоальбом</label>
+                <input type="text" id="match-photo-url" placeholder="https://vk.com/album-...">
+            </div>
+            <button class="btn-primary" onclick="adminSaveMedia()" style="width: 100%;">Сохранить медиа</button>
         </div>
     </div>
 
@@ -2859,6 +2882,24 @@
             const playersA = appData.players.filter(p => p.teamId === m.teamA);
             const playersB = appData.players.filter(p => p.teamId === m.teamB);
             
+            const startersA = playersA.slice(0, 5);
+            const subsA = playersA.slice(5);
+            const startersB = playersB.slice(0, 5);
+            const subsB = playersB.slice(5);
+            
+            const renderPitchPlayers = (players, color) => {
+                return players.map((p, i) => `
+                    <div class="pitch-player-wrap" style="animation-delay: ${i * 0.1}s; width: auto; margin: 0 5px;">
+                        <div class="player-dot" style="border-color:${color}; width:24px; height:24px; font-size:0.6rem; border-width: 2px;">
+                            ${p.name.charAt(0)}
+                        </div>
+                        <div class="player-name-pitch" style="font-size:0.55rem; margin-top:2px;">
+                            ${p.name.split(' ')[0]}
+                        </div>
+                    </div>
+                `).join('');
+            };
+
             let scoreStr = m.status === 'finished' ? `${m.scoreA} : ${m.scoreB}` : 'VS';
             let stageStr = m.stage.length > 1 ? m.stage : 'Группа ' + m.stage;
             if (m.tour && m.tour !== m.stage) stageStr += ' • Тур ' + m.tour;
@@ -2877,6 +2918,8 @@
                     <button class="tab-btn active" onclick="switchMatchTab('match-info', this)">Место и время</button>
                     <button class="tab-btn" onclick="switchMatchTab('match-lineups', this)">Стартовый состав</button>
                     <button class="tab-btn" onclick="switchMatchTab('match-events', this)">События</button>
+                    <button class="tab-btn" onclick="switchMatchTab('match-media', this)">Медиа</button>
+                    <button class="tab-btn" onclick="switchMatchTab('match-media', this)">Медиа</button>
                 </div>
 
                 <div id="match-info" class="match-tab-content">
@@ -2889,18 +2932,41 @@
                     </div>
                 </div>
 
+                <!-- ФУТБОЛЬНОЕ ПОЛЕ С РАССТАНОВКОЙ ИГРОКОВ -->
                 <div id="match-lineups" class="match-tab-content hidden">
-                    <div style="display:flex; gap:15px; flex-wrap: wrap;">
-                        <div style="flex:1; min-width: 200px; background:rgba(0,0,0,0.2); border-radius:12px; border:1px solid var(--color-border); padding:15px;">
-                            <h4 style="text-align:center; border-bottom:1px solid var(--color-border); padding-bottom:10px; margin-bottom:10px; color:${tA.color}">${tA.name}</h4>
-                            <ul style="list-style:none; padding:0; margin:0;">
-                                ${playersA.length ? playersA.map(p => `<li style="padding:8px 0; border-bottom:1px dashed rgba(255,255,255,0.05); font-size:0.95rem;"><span class="clickable-player" onclick="openPlayerModal('${p.id}')">${p.name}</span></li>`).join('') : '<li style="text-align:center; font-size:0.9rem; color:var(--color-text-muted); margin-top:10px;">Состав не заявлен</li>'}
+                    <div class="pitch-container" style="margin-bottom: 20px; aspect-ratio: 3/4; max-width: 400px; transform: none; box-shadow: var(--shadow-elevation);">
+                        <div class="pitch-goal-area-top"></div>
+                        <div class="pitch-center-circle"></div>
+                        <div class="pitch-center-dot"></div>
+                        <div class="pitch-goal-area-bottom"></div>
+                        
+                        <div class="pitch-half" style="flex-direction: column; justify-content: space-around; padding: 10px;">
+                            <div style="display: flex; justify-content: center;">${startersA[0] ? renderPitchPlayers([startersA[0]], tA.color) : ''}</div>
+                            <div style="display: flex; justify-content: space-evenly; width: 100%;">
+                                ${renderPitchPlayers(startersA.slice(1), tA.color)}
+                            </div>
+                        </div>
+                        
+                        <div class="pitch-half" style="flex-direction: column-reverse; justify-content: space-around; padding: 10px;">
+                            <div style="display: flex; justify-content: center;">${startersB[0] ? renderPitchPlayers([startersB[0]], tB.color) : ''}</div>
+                            <div style="display: flex; justify-content: space-evenly; width: 100%;">
+                                ${renderPitchPlayers(startersB.slice(1), tB.color)}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ЗАПАСНЫЕ ИГРОКИ -->
+                    <div style="display:flex; gap:15px; margin-top: 20px; flex-wrap: wrap;">
+                        <div style="flex:1; min-width: 150px; background:rgba(0,0,0,0.2); border-radius:12px; padding:15px;">
+                            <h5 style="color: ${tA.color}; margin-bottom: 10px; border-bottom: 1px solid var(--color-border); padding-bottom: 5px;">Запасные</h5>
+                            <ul style="list-style:none; padding:0; margin:0; font-size:0.85rem; color: var(--color-text-muted);">
+                                ${subsA.length ? subsA.map(p => `<li style="padding:4px 0;"><span class="clickable-player" onclick="openPlayerModal('${p.id}')">${p.name}</span></li>`).join('') : 'Нет'}
                             </ul>
                         </div>
-                        <div style="flex:1; min-width: 200px; background:rgba(0,0,0,0.2); border-radius:12px; border:1px solid var(--color-border); padding:15px;">
-                            <h4 style="text-align:center; border-bottom:1px solid var(--color-border); padding-bottom:10px; margin-bottom:10px; color:${tB.color}">${tB.name}</h4>
-                            <ul style="list-style:none; padding:0; margin:0;">
-                                ${playersB.length ? playersB.map(p => `<li style="padding:8px 0; border-bottom:1px dashed rgba(255,255,255,0.05); font-size:0.95rem;"><span class="clickable-player" onclick="openPlayerModal('${p.id}')">${p.name}</span></li>`).join('') : '<li style="text-align:center; font-size:0.9rem; color:var(--color-text-muted); margin-top:10px;">Состав не заявлен</li>'}
+                        <div style="flex:1; min-width: 150px; background:rgba(0,0,0,0.2); border-radius:12px; padding:15px; text-align: right;">
+                            <h5 style="color: ${tB.color}; margin-bottom: 10px; border-bottom: 1px solid var(--color-border); padding-bottom: 5px;">Запасные</h5>
+                            <ul style="list-style:none; padding:0; margin:0; font-size:0.85rem; color: var(--color-text-muted);">
+                                ${subsB.length ? subsB.map(p => `<li style="padding:4px 0;"><span class="clickable-player" onclick="openPlayerModal('${p.id}')">${p.name}</span></li>`).join('') : 'Нет'}
                             </ul>
                         </div>
                     </div>
@@ -2908,6 +2974,10 @@
 
                 <div id="match-events" class="match-tab-content hidden">
                     ${generateEventsTimeline(m)}
+                </div>
+
+                <div id="match-media" class="match-tab-content hidden">
+                    ${generateMediaTab(m)}
                 </div>
             `;
             document.getElementById('match-modal-content').innerHTML = html;
@@ -2940,6 +3010,27 @@
             }).join('');
 
             return `<div class="event-timeline" style="padding: 10px;">${timelineHtml}</div>`;
+        }
+
+        function generateMediaTab(match) {
+            let mediaHtml = '';
+            if (match.videoUrl || match.photoUrl) {
+                if (match.videoUrl) {
+                    let embedUrl = match.videoUrl;
+                    if (embedUrl.includes('watch?v=')) embedUrl = embedUrl.replace('watch?v=', 'embed/');
+                    else if (embedUrl.includes('youtu.be/')) embedUrl = embedUrl.replace('youtu.be/', 'youtube.com/embed/');
+
+                    mediaHtml += `<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; margin-bottom: 20px; box-shadow: var(--shadow-elevation);">
+                        <iframe src="${embedUrl}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allowfullscreen></iframe>
+                    </div>`;
+                }
+                if (match.photoUrl) {
+                    mediaHtml += `<a href="${match.photoUrl}" target="_blank" style="display: block; background: var(--color-card); border: 1px solid var(--color-border); padding: 15px; text-align: center; border-radius: 12px; font-weight: bold; color: var(--color-primary); transition: all var(--transition-speed); box-shadow: var(--shadow-elevation);">📸 Смотреть фотоальбом матча</a>`;
+                }
+            } else {
+                mediaHtml = `<div style="text-align:center; padding:40px 20px; color:var(--color-text-muted); background:rgba(0,0,0,0.2); border-radius:12px; border:1px dashed var(--color-border);">${match.status === 'upcoming' ? '🎥 Медиа появятся после окончания матча.' : 'ℹ️ Для этого матча еще не загружены медиафайлы.'}</div>`;
+            }
+            return mediaHtml;
         }
 
         function switchMatchTab(tabId, btn) {
@@ -3147,7 +3238,7 @@
             // Матчи
             let matchesHtml = appData.matches.map((m, i) => {
                 return `
-                <div class="admin-row" style="grid-template-columns: 2fr 80px 60px 20px 60px 1.5fr auto auto;">
+                <div class="admin-row" style="grid-template-columns: 2fr 80px 60px 20px 60px 1.5fr auto auto auto;">
                     <div><div style="font-size:0.8rem;color:var(--color-text-muted)">${m.date}</div>${getTeam(m.teamA).name} - ${getTeam(m.teamB).name}</div>
                     <input type="text" id="tr-${i}" value="${m.tour || ''}" placeholder="Тур">
                     <input type="number" id="scA-${i}" value="${m.scoreA !== null ? m.scoreA : ''}" placeholder="-">
@@ -3160,6 +3251,7 @@
                     </select>
                     <button class="btn-sm" onclick="adminSaveMatch(${i})">Сохранить</button>
                     <button class="btn-sm" style="background: var(--color-text-muted); color: var(--color-bg);" onclick="openEventEditor(${i})">События</button>
+                    <button class="btn-sm" style="background: var(--color-gold); color: #000;" onclick="openMediaEditor(${i})">Медиа</button>
                 </div>
                 `;
             }).join('');
@@ -3725,6 +3817,27 @@
             if (event.type === 'goal') { const p = appData.players.find(pl => pl.id === event.playerId); if(p && p.goals > 0) p.goals--; }
             appData.matches[currentMatchIndexForEvents].events.splice(eventIndex, 1);
             saveData(); renderEventEditorList();
+        }
+
+        /* ==========================================================================
+           РЕДАКТОР МЕДИА МАТЧА
+           ========================================================================== */
+        let currentMatchIndexForMedia = -1;
+        function openMediaEditor(matchIndex) {
+            currentMatchIndexForMedia = matchIndex;
+            const match = appData.matches[matchIndex];
+            document.getElementById('media-editor-title').innerText = `Медиа: ${getTeam(match.teamA).name} - ${getTeam(match.teamB).name}`;
+            document.getElementById('match-video-url').value = match.videoUrl || '';
+            document.getElementById('match-photo-url').value = match.photoUrl || '';
+            document.getElementById('media-editor-modal').classList.add('open');
+        }
+
+        function adminSaveMedia() {
+            if (currentMatchIndexForMedia === -1) return;
+            appData.matches[currentMatchIndexForMedia].videoUrl = document.getElementById('match-video-url').value.trim();
+            appData.matches[currentMatchIndexForMedia].photoUrl = document.getElementById('match-photo-url').value.trim();
+            saveData();
+            closeModal('media-editor-modal');
         }
 
         function adminResetMatches() {
