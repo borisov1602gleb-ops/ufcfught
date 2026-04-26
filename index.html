@@ -1222,6 +1222,48 @@
         .dg-slot.filled {
             opacity: 1; transform: translateY(0) scale(1); border-style: solid; border-width: 2px; background: var(--color-card); box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
+
+        /* Стили для Drag&Drop сетки плей-офф в админке */
+        .admin-bracket-match {
+            background: var(--color-card);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            margin: 10px 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .admin-bracket-team {
+            padding: 12px;
+            border-bottom: 1px solid var(--color-border);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .admin-bracket-team:last-child { border-bottom: none; }
+        .admin-bracket-team.draggable-team {
+            cursor: grab;
+            background: rgba(163, 230, 53, 0.1);
+            border: 1px solid var(--color-primary);
+            color: var(--color-primary);
+            font-weight: 800;
+            margin: -1px; /* Компенсация за рамку */
+        }
+        .admin-bracket-team.draggable-team:active { cursor: grabbing; }
+        .admin-bracket-slot {
+            background: rgba(0,0,0,0.2);
+            color: var(--color-text-muted);
+            text-align: center;
+            font-size: 0.8rem;
+            border: 1px dashed var(--color-border);
+            transition: all 0.3s;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 5px;
+        }
+        .admin-bracket-slot.drag-over { background: rgba(163, 230, 53, 0.1); border-color: var(--color-primary); color: var(--color-primary); transform: scale(1.05); }
+        .clear-slot { cursor: pointer; color: var(--color-danger); font-weight: bold; margin-left: 10px; display: inline-block; padding: 0 5px; border-radius: 50%; line-height: 1; }
+        .clear-slot:hover { background: var(--color-danger); color: white; }
     </style>
 </head>
 <body>
@@ -1490,6 +1532,7 @@
                     <button class="tab-btn active" data-target="admin-matches"><i class="ph-bold ph-calendar"></i> Матчи</button>
                     <button class="tab-btn" data-target="admin-players"><i class="ph-bold ph-users"></i> Игроки</button>
                     <button class="tab-btn" data-target="admin-manage-teams"><i class="ph-bold ph-shield"></i> Команды</button>
+                    <button class="tab-btn" data-target="admin-playoff-manage"><i class="ph-bold ph-graph"></i> Сетка Плей-офф</button>
                     <button class="tab-btn" data-target="admin-news"><i class="ph-bold ph-article"></i> Новости</button>
                     <button class="tab-btn" data-target="admin-settings"><i class="ph-bold ph-gear"></i> Настройки</button>
                     <button class="tab-btn" data-target="admin-tools"><i class="ph-bold ph-wrench"></i> Управление</button>
@@ -1520,6 +1563,12 @@
                     <div id="admin-manage-teams" class="admin-tab-content hidden">
                         <h3 style="margin-bottom: 20px; font-size: 1.5rem;">Управление командами</h3>
                         <div id="admin-manage-teams-list"></div>
+                    </div>
+
+                    <div id="admin-playoff-manage" class="admin-tab-content hidden">
+                        <h3 style="margin-bottom: 10px; font-size: 1.5rem;">Управление сеткой Плей-офф</h3>
+                        <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 25px;">Перетащите победителей из предыдущего раунда в пустые слоты, чтобы сформировать пары.</p>
+                        <div id="admin-bracket-content"></div>
                     </div>
 
                     <div id="admin-news" class="admin-tab-content hidden">
@@ -2649,6 +2698,12 @@
             `).join('');
             document.getElementById('admin-manage-teams-list').innerHTML = teamsEditHtml;
 
+            // Сетка плей-офф
+            const adminPlayoffContainer = document.getElementById('admin-playoff-manage');
+            if (adminPlayoffContainer && !adminPlayoffContainer.classList.contains('hidden')) {
+                renderAdminPlayoff();
+            }
+
             // Дорожная карта
             let roadmapHtml = appData.settings.roadmap.map((r, i) => `
                 <div class="admin-row" style="grid-template-columns: 100px 2fr 1fr auto auto;">
@@ -2916,6 +2971,100 @@
             closeModal('draw-process-modal');
             alert('Жеребьевка успешно проведена и результаты сохранены!');
             renderAdmin();
+        }
+
+        /* ==========================================================================
+           DRAG & DROP ДЛЯ СЕТКИ ПЛЕЙ-ОФФ
+           ========================================================================== */
+        
+        function renderAdminPlayoff() {
+            const qf = appData.matches.filter(m => m.stage === '1/4');
+            const sf = appData.matches.filter(m => m.stage === '1/2');
+            const th = appData.matches.find(m => m.stage === '3rd') || { id: 'M31', stage: "3rd", teamA: null, teamB: null };
+            const fi = appData.matches.find(m => m.stage === 'Final') || { id: 'M32', stage: "Final", teamA: null, teamB: null };
+
+            function drawAdminMatch(m) {
+                if (!m) return '';
+                const tA = m.teamA ? getTeam(m.teamA) : null;
+                const tB = m.teamB ? getTeam(m.teamB) : null;
+
+                const isTargetMatch = ['1/2', '3rd', 'Final'].includes(m.stage);
+
+                const isWinnerA = m.status === 'finished' && m.scoreA > m.scoreB;
+                const isWinnerB = m.status === 'finished' && m.scoreB > m.scoreA;
+                const isLoserA = m.status === 'finished' && m.scoreA < m.scoreB;
+                const isLoserB = m.status === 'finished' && m.scoreB < m.scoreA;
+
+                const isDraggableA = isWinnerA || (m.stage === '1/2' && (isWinnerA || isLoserA));
+                const isDraggableB = isWinnerB || (m.stage === '1/2' && (isWinnerB || isLoserB));
+
+                const slotA = tA
+                    ? `<div class="admin-bracket-team ${isDraggableA ? 'draggable-team' : ''}" ${isDraggableA ? `draggable="true" ondragstart="dragStart(event, '${tA.id}')"` : ''}>
+                        ${tA.name}
+                        ${isTargetMatch ? `<span class="clear-slot" onclick="clearPlayoffSlot('${m.id}', 'A')">✖</span>` : ''}
+                       </div>`
+                    : (isTargetMatch ? `<div class="admin-bracket-slot" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event, '${m.id}', 'A')">Слот 1</div>` : `<div class="admin-bracket-team" style="padding:12px; text-align:center; color: var(--color-text-muted);">-</div>`);
+
+                const slotB = tB
+                    ? `<div class="admin-bracket-team ${isDraggableB ? 'draggable-team' : ''}" ${isDraggableB ? `draggable="true" ondragstart="dragStart(event, '${tB.id}')"` : ''}>
+                        ${tB.name}
+                        ${isTargetMatch ? `<span class="clear-slot" onclick="clearPlayoffSlot('${m.id}', 'B')">✖</span>` : ''}
+                       </div>`
+                    : (isTargetMatch ? `<div class="admin-bracket-slot" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event, '${m.id}', 'B')">Слот 2</div>` : `<div class="admin-bracket-team" style="padding:12px; text-align:center; color: var(--color-text-muted);">-</div>`);
+
+                return `<div class="admin-bracket-match">${slotA}${slotB}</div>`;
+            }
+
+            const html = `
+                <div class="bracket">
+                    <div class="bracket-round">
+                        <div class="bracket-title">1/4 Финала</div>
+                        ${qf.map(m => drawAdminMatch(m)).join('')}
+                    </div>
+                    <div class="bracket-round">
+                        <div class="bracket-title">1/2 Финала</div>
+                        ${sf.map(m => drawAdminMatch(m)).join('')}
+                    </div>
+                    <div class="bracket-round">
+                        <div class="bracket-title" style="color: var(--color-gold);">Финал</div>
+                        ${drawAdminMatch(fi)}
+                        <div style="margin-top: 20px;">
+                            <div class="bracket-title" style="color: var(--color-bronze);">Матч за 3-е место</div>
+                            ${drawAdminMatch(th)}
+                        </div>
+                    </div>
+                </div>
+            `;
+            const container = document.getElementById('admin-bracket-content');
+            if (container) container.innerHTML = html;
+        }
+
+        function clearPlayoffSlot(matchId, slot) {
+            if (!confirm('Очистить этот слот?')) return;
+            const match = appData.matches.find(m => m.id === matchId);
+            if (match) {
+                if (slot === 'A') match.teamA = null;
+                if (slot === 'B') match.teamB = null;
+                saveData();
+                renderAdminPlayoff();
+            }
+        }
+
+        function dragStart(event, teamId) { event.dataTransfer.setData("text/plain", teamId); event.dataTransfer.effectAllowed = "move"; }
+        function dragOver(event) { event.preventDefault(); event.target.classList.add('drag-over'); }
+        function dragLeave(event) { event.target.classList.remove('drag-over'); }
+
+        function drop(event, targetMatchId, targetSlot) {
+            event.preventDefault();
+            event.target.classList.remove('drag-over');
+            const teamId = event.dataTransfer.getData("text/plain");
+            const targetMatch = appData.matches.find(m => m.id === targetMatchId);
+            if (!targetMatch) return;
+            if (targetMatch[targetSlot === 'A' ? 'teamB' : 'teamA'] === teamId) { alert('Команда не может играть сама с собой.'); return; }
+            appData.matches.forEach(m => { if (['1/2', '3rd', 'Final'].includes(m.stage)) { if (m.teamA === teamId) m.teamA = null; if (m.teamB === teamId) m.teamB = null; } });
+            if (targetSlot === 'A') targetMatch.teamA = teamId; else targetMatch.teamB = teamId;
+            saveData();
+            renderAdminPlayoff();
         }
 
         function adminResetMatches() {
