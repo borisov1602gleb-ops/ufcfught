@@ -998,7 +998,7 @@
             justify-content: flex-start;
             padding: 40px 20px;
         }
-        .final-header { text-align: center; margin-bottom: 30px; animation: fadeInDown 1s ease-out; }
+        .final-header { text-align: center; margin-bottom: 30px; animation: fadeInDown 1s ease-out; position: relative; z-index: 10; }
         .final-title { font-size: 4rem; color: var(--color-gold); font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; text-shadow: 0 0 30px rgba(251, 191, 36, 0.4); margin-bottom: 10px; }
         .final-matchup { display: flex; align-items: center; justify-content: center; gap: 30px; font-size: 2.5rem; font-weight: 800; text-transform: uppercase; margin-bottom: 20px; }
         .final-vs { color: var(--color-danger); font-size: 1.5rem; font-weight: 900; background: rgba(255,0,0,0.1); padding: 10px 20px; border-radius: 12px; }
@@ -1042,6 +1042,36 @@
             transform: scale(1); opacity: 1;
             box-shadow: 0 0 20px rgba(163, 230, 53, 0.4);
         }
+
+        /* Конфетти для Финала */
+        .confetti-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: 1; }
+        .confetti {
+            position: absolute;
+            top: -20px;
+            opacity: 0.8;
+            animation: fall linear infinite;
+            border-radius: 2px;
+        }
+        @keyframes fall {
+            0% { transform: translateY(-10vh) rotate(0deg) rotateX(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(720deg) rotateX(360deg); opacity: 0; }
+        }
+
+        /* Стили для Режима Регистрации */
+        .reg-overlay { justify-content: flex-start; overflow-y: auto; padding: 40px 20px; }
+        .btn-huge { font-size: 1.3rem; padding: 20px 40px; border-radius: 50px; box-shadow: 0 10px 30px rgba(163, 230, 53, 0.4); animation: pulse 2s infinite; letter-spacing: 1px; }
+        .reg-step { display: none; animation: fadeInRight 0.4s ease-out; }
+        .reg-step.active { display: block; }
+        .reg-progress { display: flex; gap: 8px; margin-bottom: 30px; }
+        .reg-progress-bar { height: 6px; flex: 1; background: var(--color-border); border-radius: 3px; transition: all 0.4s; }
+        .reg-progress-bar.active { background: var(--color-primary); box-shadow: 0 0 10px rgba(163,230,53,0.5); }
+        
+        @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .reg-team-card { background: var(--color-card-glass); border: 1px solid var(--color-border); padding: 15px; border-radius: 12px; display: flex; align-items: center; gap: 15px; }
 
         /* ==========================================================================
            АДМИН ПАНЕЛЬ
@@ -1349,6 +1379,10 @@
         🏆 ВНИМАНИЕ: ВКЛЮЧЕН РЕЖИМ "ГРАНД ФИНАЛ". ПУБЛИЧНЫЙ ДОСТУП ПЕРЕКРЫТ ЭПИЧНЫМ ЭКРАНОМ ФИНАЛА.
     </div>
 
+    <div id="admin-reg-banner" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; background: #9b59b6; color: #fff; text-align: center; padding: 6px; z-index: 10001; font-weight: 800; font-size: 0.85rem; letter-spacing: 1px;">
+        📝 ВНИМАНИЕ: ВКЛЮЧЕН РЕЖИМ "РЕГИСТРАЦИЯ". ПУБЛИКА ВИДИТ СТРАНИЦУ НАБОРА КОМАНД.
+    </div>
+
     <!-- ЭКРАН ТЕХНИЧЕСКИХ РАБОТ -->
     <div id="maintenance-screen" class="maint-overlay hidden">
         <div class="football-anim-container">
@@ -1412,6 +1446,7 @@
 
     <!-- ЭКРАН ГРАНД ФИНАЛА -->
     <div id="final-screen" class="maint-overlay hidden">
+        <div id="confetti-container" class="confetti-container"></div>
         <div class="final-header">
             <svg class="final-trophy" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
@@ -1424,7 +1459,38 @@
             <div class="final-title">Гранд Финал</div>
             <div id="final-teams-display" class="final-matchup">Загрузка...</div>
         </div>
-        <div id="final-pitch-display"></div>
+        <div id="final-pitch-display" style="position: relative; z-index: 10;"></div>
+    </div>
+
+    <!-- ЭКРАН РЕГИСТРАЦИИ НА ТУРНИР -->
+    <div id="registration-screen" class="maint-overlay reg-overlay hidden">
+        <div style="max-width: 1000px; width: 100%; margin: 0 auto; text-align: left;">
+            <div class="text-center" style="margin-top: 20px; margin-bottom: 50px;">
+                <div class="logo" style="justify-content: center; font-size: 2rem; margin-bottom: 20px;">URBAN<span>CUP</span></div>
+                <h1 style="font-size: 3rem; color: var(--color-text); text-transform: uppercase; letter-spacing: 1px; line-height: 1.2;">Регистрация на <span style="color: var(--color-primary);">турнир</span></h1>
+                <p style="font-size: 1.2rem; color: var(--color-text-muted); margin-bottom: 40px; margin-top: 10px;">Официальный набор команд на новый сезон открыт. Количество мест ограничено!</p>
+                <button class="btn-primary btn-huge" onclick="openRegModal()">ПОДАТЬ ЗАЯВКУ НА УЧАСТИЕ</button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 50px;">
+                <div style="background: var(--color-card-glass); padding: 30px; border-radius: var(--border-radius); border: 1px solid var(--color-border);">
+                    <h3 style="color: var(--color-primary); margin-bottom: 15px; font-size: 1.5rem;">ℹ️ Информация</h3>
+                    <ul style="list-style: none; color: var(--color-text-muted); line-height: 2;">
+                        <li><strong>Формат:</strong> 5х5 (до 15 человек в заявке)</li>
+                        <li><strong>Длительность:</strong> 2 тайма по 20 минут</li>
+                        <li><strong>Взнос за турнир:</strong> 15 000 ₽ с команды</li>
+                        <li><strong>Призовой фонд:</strong> 100 000 ₽ + Кубок и медали</li>
+                    </ul>
+                </div>
+                <div style="background: var(--color-card-glass); padding: 30px; border-radius: var(--border-radius); border: 1px solid var(--color-border);">
+                    <h3 style="color: var(--color-primary); margin-bottom: 15px; font-size: 1.5rem;">📅 Дорожная карта</h3>
+                    <div id="reg-roadmap-list" class="roadmap" style="transform: scale(0.9); transform-origin: top left; margin-bottom: -20px;"></div>
+                </div>
+            </div>
+
+            <h2 class="section-title text-center" style="width: 100%;">Зарегистрированные участники (<span id="reg-teams-count">0</span>)</h2>
+            <div id="reg-teams-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; margin-bottom: 50px;"></div>
+        </div>
     </div>
 
     <!-- НАВИГАЦИЯ -->
@@ -1696,6 +1762,17 @@
                             </div>
                         </div>
 
+                        <div class="form-group toggle-group" style="border-color: #9b59b6;">
+                            <label class="switch">
+                                <input type="checkbox" id="set-registration" onchange="toggleRegistrationMode()">
+                                <span class="slider" style="background-color: #333;"></span>
+                            </label>
+                            <div>
+                                <strong style="display:block; color:#9b59b6;">Режим "Регистрация открыта"</strong>
+                                <span style="font-size: 0.8rem; color:var(--color-text-muted);">Переводит сайт в режим приема заявок (посадочная страница)</span>
+                            </div>
+                        </div>
+
                         <div class="form-group toggle-group">
                             <label class="switch">
                                 <input type="checkbox" id="set-draw" onchange="toggleDrawMode()">
@@ -1862,6 +1939,60 @@
         </div>
     </div>
 
+    <!-- МОДАЛКА: ФОРМА РЕГИСТРАЦИИ (4 ЭТАПА) -->
+    <div class="modal-overlay" id="reg-modal">
+        <div class="modal-content" style="max-width: 500px; padding: 40px;">
+            <button class="modal-close" onclick="closeModal('reg-modal')">✖</button>
+            
+            <div class="reg-progress" id="reg-progress-bars">
+                <div class="reg-progress-bar active" id="pb-1"></div>
+                <div class="reg-progress-bar" id="pb-2"></div>
+                <div class="reg-progress-bar" id="pb-3"></div>
+                <div class="reg-progress-bar" id="pb-4"></div>
+            </div>
+
+            <!-- ШАГ 1 -->
+            <div class="reg-step active" id="reg-step-1">
+                <h2 style="margin-bottom: 20px; font-size: 1.8rem;">Шаг 1: Основные данные</h2>
+                <div class="form-group"><label>Название команды *</label><input type="text" id="reg-team-name" placeholder="Например: Спартак"></div>
+                <div class="form-group"><label>ФИО Капитана *</label><input type="text" id="reg-captain-name" placeholder="Иванов Иван Иванович"></div>
+                <div class="form-group"><label>Номер телефона (Telegram/WhatsApp) *</label><input type="tel" id="reg-phone" placeholder="+7 (999) 000-00-00"></div>
+                <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="nextRegStep(1)">Далее ➔</button>
+            </div>
+
+            <!-- ШАГ 2 -->
+            <div class="reg-step" id="reg-step-2">
+                <h2 style="margin-bottom: 20px; font-size: 1.8rem;">Шаг 2: Детали команды</h2>
+                <div class="form-group"><label>Основной цвет формы (для графики)</label><input type="color" id="reg-team-color" value="#a3e635" style="height: 50px; padding: 2px;"></div>
+                <div class="form-group"><label>Район базирования (опционально)</label><input type="text" id="reg-district" placeholder="Центральный район"></div>
+                <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="nextRegStep(2)">Далее ➔</button>
+                <button class="btn-sm" style="width: 100%; margin-top: 10px; background: transparent; color: var(--color-text-muted);" onclick="prevRegStep(2)">🠔 Назад</button>
+            </div>
+
+            <!-- ШАГ 3 -->
+            <div class="reg-step" id="reg-step-3">
+                <h2 style="margin-bottom: 20px; font-size: 1.8rem;">Шаг 3: Способ оплаты</h2>
+                <p style="font-size: 0.9rem; color: var(--color-text-muted); margin-bottom: 20px;">Взнос за участие в турнире составляет 15 000 ₽. Выберите удобный способ внесения:</p>
+                <div class="form-group">
+                    <select id="reg-payment-method" style="font-size: 1.1rem; padding: 15px;">
+                        <option value="card">💳 Перевод на карту (Тинькофф/Сбер)</option>
+                        <option value="cash">💵 Наличными на собрании капитанов</option>
+                    </select>
+                </div>
+                <button class="btn-primary" style="width: 100%; margin-top: 10px; background: var(--color-gold); color: #000;" onclick="submitRegistration()">Завершить регистрацию ✔</button>
+                <button class="btn-sm" style="width: 100%; margin-top: 10px; background: transparent; color: var(--color-text-muted);" onclick="prevRegStep(3)">🠔 Назад</button>
+            </div>
+
+            <!-- ШАГ 4 (Успех) -->
+            <div class="reg-step" id="reg-step-4" style="text-align: center; padding: 20px 0;">
+                <div style="font-size: 4rem; margin-bottom: 10px;">✅</div>
+                <h2 style="margin-bottom: 15px; font-size: 2rem; color: var(--color-primary);">Заявка принята!</h2>
+                <p id="reg-final-msg" style="color: var(--color-text-muted); font-size: 1.1rem; margin-bottom: 30px;"></p>
+                <button class="btn-primary" style="width: 100%;" onclick="closeModal('reg-modal')">Отлично!</button>
+            </div>
+        </div>
+    </div>
+
     <!-- ПАНЕЛЬ LIVE EDIT (ПЛАВАЮЩАЯ) -->
     <div id="live-edit-toolbar" class="hidden" style="position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); background: var(--color-card); border: 2px solid var(--color-primary); padding: 15px 30px; border-radius: 40px; z-index: 10000; display: flex; gap: 15px; align-items: center; box-shadow: 0 10px 40px rgba(0,0,0,0.9);">
         <span style="color: var(--color-primary); font-weight: bold; margin-right: 15px; display: flex; align-items: center; gap: 8px;"><div class="pulse"></div> Live Edit Активен</span>
@@ -1914,6 +2045,7 @@
                 maintenance: false,
                 drawMode: false,
                 finalMode: false,
+                registrationMode: false,
                 theme: "dark",
                 roadmap: [
                     { status: "completed", date: "15.06", text: "Регистрация команд" },
@@ -2025,6 +2157,7 @@
         if (!appData.settings.titles) appData.settings.titles = JSON.parse(JSON.stringify(mockData.settings.titles));
         if (appData.settings.drawMode === undefined) appData.settings.drawMode = false;
         if (appData.settings.finalMode === undefined) appData.settings.finalMode = false;
+        if (appData.settings.registrationMode === undefined) appData.settings.registrationMode = false;
         
         if (!appData.news) appData.news = JSON.parse(JSON.stringify(mockData.news));
         if (!appData.players) appData.players = JSON.parse(JSON.stringify(mockData.players));
@@ -2057,6 +2190,8 @@
             const drawBanner = document.getElementById('admin-draw-banner');
             const finalScreen = document.getElementById('final-screen');
             const finalBanner = document.getElementById('admin-final-banner');
+            const regScreen = document.getElementById('registration-screen');
+            const regBanner = document.getElementById('admin-reg-banner');
             const isAdminView = !document.getElementById('admin').classList.contains('hidden');
             
             if (!maintScreen) return;
@@ -2067,9 +2202,20 @@
             if(drawBanner) drawBanner.classList.add('hidden');
             if(finalScreen) finalScreen.classList.add('hidden');
             if(finalBanner) finalBanner.classList.add('hidden');
+            if(regScreen) regScreen.classList.add('hidden');
+            if(regBanner) regBanner.classList.add('hidden');
             document.body.style.overflow = '';
             
             if (appData.settings.finalMode) {
+            if (appData.settings.registrationMode) {
+                if (isAdminView) {
+                    if(regBanner) regBanner.classList.remove('hidden');
+                } else {
+                    if(regScreen) regScreen.classList.remove('hidden');
+                    renderRegistrationScreen();
+                    document.body.style.overflow = 'auto';
+                }
+            } else if (appData.settings.finalMode) {
                 if (isAdminView) {
                     if(finalBanner) finalBanner.classList.remove('hidden');
                 } else {
@@ -2161,6 +2307,11 @@
         
         // Скрытый вход с экрана финала
         document.getElementById('final-screen').addEventListener('dblclick', () => {
+            document.getElementById('login-modal').classList.add('open');
+        });
+
+        // Скрытый вход с экрана регистрации
+        document.getElementById('registration-screen').addEventListener('dblclick', () => {
             document.getElementById('login-modal').classList.add('open');
         });
 
@@ -2262,6 +2413,27 @@
                     <div class="pitch-half" style="flex-direction: row-reverse;">${renderPlayers(playersB, tB.color)}</div>
                 </div>
             `;
+
+            initConfetti();
+        }
+
+        function initConfetti() {
+            const container = document.getElementById('confetti-container');
+            if (!container) return;
+            container.innerHTML = '';
+            const colors = ['var(--color-gold)', '#f59e0b', '#d97706', '#ffffff', 'var(--color-primary)'];
+            for (let i = 0; i < 150; i++) {
+                const conf = document.createElement('div');
+                conf.className = 'confetti';
+                conf.style.left = Math.random() * 100 + '%';
+                conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                conf.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                conf.style.animationDelay = Math.random() * 5 + 's';
+                const size = Math.random() * 8 + 6;
+                conf.style.width = size + 'px';
+                conf.style.height = (size * 1.5) + 'px';
+                container.appendChild(conf);
+            }
         }
 
         /* ==========================================================================
@@ -2960,6 +3132,7 @@
             document.getElementById('set-theme').checked = appData.settings.theme === 'light';
             if(document.getElementById('set-draw')) document.getElementById('set-draw').checked = !!appData.settings.drawMode;
             if(document.getElementById('set-final')) document.getElementById('set-final').checked = !!appData.settings.finalMode;
+            if(document.getElementById('set-registration')) document.getElementById('set-registration').checked = !!appData.settings.registrationMode;
             if(document.getElementById('set-show-roadmap')) document.getElementById('set-show-roadmap').checked = !!appData.settings.showRoadmap;
         }
 
@@ -3099,6 +3272,12 @@
 
         function toggleFinalMode() {
             appData.settings.finalMode = document.getElementById('set-final').checked;
+            saveData();
+            applyMaintenance();
+        }
+
+        function toggleRegistrationMode() {
+            appData.settings.registrationMode = document.getElementById('set-registration').checked;
             saveData();
             applyMaintenance();
         }
