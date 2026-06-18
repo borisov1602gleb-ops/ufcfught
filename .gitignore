@@ -11,3 +11,5 @@ frontend/dist/
 # Прочее
 .DS_Store
 *.log
+
+frontend/tsconfig.tsbuildinfo
