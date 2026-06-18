@@ -5,6 +5,7 @@ export interface Skill {
   title: string;
   description: string;
   icon: string;
+  tag: string;
   entry_point: string;
 }
 

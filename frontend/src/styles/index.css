@@ -1,19 +1,3 @@
-:root {
-  --navy: #0f2a4a;
-  --navy-deep: #0a1f38;
-  --accent: #c8a45c; /* приглушённое золото — юридическая классика */
-  --accent-hover: #d8b878;
-  --bg: #f4f6f9;
-  --card: #ffffff;
-  --text: #1a2433;
-  --text-muted: #6b7686;
-  --border: #dfe4ea;
-  --danger: #c0392b;
-  --danger-bg: #fdecea;
-  --radius: 12px;
-  --shadow: 0 12px 40px rgba(15, 42, 74, 0.12);
-}
-
 * {
   box-sizing: border-box;
 }
@@ -26,126 +10,17 @@ body,
 }
 
 body {
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  color: var(--text);
-  background: var(--bg);
+  font-family: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #eef3ff;
+  background: #05060c;
 }
 
+/* Экран-заглушка (например, проверка сессии при загрузке). */
 .screen-center {
   display: grid;
   place-items: center;
-  height: 100%;
-  color: var(--text-muted);
-}
-
-/* ===== Хаб ===== */
-.hub {
-  max-width: 1080px;
-  margin: 0 auto;
-  padding: 40px 24px;
-}
-
-.hub__header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 32px;
-}
-
-.hub__title {
-  margin: 0 0 4px;
-  font-size: 28px;
-}
-
-.hub__user {
-  margin: 0;
-  color: var(--text-muted);
-  font-size: 15px;
-}
-
-.hub__role {
-  color: var(--navy);
-  font-weight: 600;
-}
-
-.hub__logout {
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 9px 16px;
-  cursor: pointer;
+  min-height: 100vh;
+  color: rgba(176, 190, 220, 0.7);
+  background: radial-gradient(120% 100% at 25% 12%, #161a2e 0%, #0b0d1a 45%, #05060c 100%);
   font-size: 14px;
-  color: var(--text);
-}
-
-.hub__logout:hover {
-  border-color: var(--navy);
-}
-
-.hub__empty {
-  color: var(--text-muted);
-}
-
-.hub__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
-}
-
-.skill-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 24px;
-  cursor: pointer;
-  transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s;
-}
-
-.skill-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow);
-  border-color: transparent;
-}
-
-.skill-card__icon {
-  width: 44px;
-  height: 44px;
-  display: grid;
-  place-items: center;
-  background: var(--navy);
-  color: var(--accent);
-  border-radius: 10px;
-  font-size: 20px;
-  margin-bottom: 16px;
-}
-
-.skill-card__title {
-  margin: 0 0 8px;
-  font-size: 18px;
-}
-
-.skill-card__desc {
-  margin: 0 0 16px;
-  color: var(--text-muted);
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.skill-card__cta {
-  color: var(--navy);
-  font-weight: 600;
-  font-size: 14px;
-}
-
-/* ===== Адаптив ===== */
-@media (max-width: 860px) {
-  .auth-layout {
-    grid-template-columns: 1fr;
-  }
-  .auth-brand {
-    padding: 40px 32px;
-  }
-  .auth-brand__title {
-    font-size: 26px;
-  }
 }

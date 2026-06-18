@@ -41,6 +41,7 @@ def me(current: User = Depends(get_current_user)) -> MeResponse:
                 title=s.title,
                 description=s.description,
                 icon=s.icon,
+                tag=s.tag,
                 entry_point=s.entry_point,
             )
             for s in skills

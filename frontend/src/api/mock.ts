@@ -18,6 +18,7 @@ const DOC_SKILL = {
   title: "Конструктор документов",
   description: "Практика → документ → форма с вопросами → готовый .docx",
   icon: "file-text",
+  tag: "Документы",
   entry_point: "/skills/doc-constructor",
 };
 

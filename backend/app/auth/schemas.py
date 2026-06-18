@@ -17,6 +17,7 @@ class SkillOut(BaseModel):
     title: str
     description: str
     icon: str
+    tag: str
     entry_point: str
 
 
