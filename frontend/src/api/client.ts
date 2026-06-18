@@ -1,5 +1,6 @@
 // Тонкий клиент API. Хранит токен и подставляет заголовок Authorization.
 import type { Me } from "./types";
+import { MOCK_ENABLED, mockFetchMe, mockLogin } from "./mock";
 
 const TOKEN_KEY = "auth_token";
 
@@ -41,6 +42,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 }
 
 export async function login(username: string, password: string): Promise<string> {
+  if (MOCK_ENABLED) return mockLogin(username, password);
   const data = await request<{ access_token: string }>("/api/auth/login", {
     method: "POST",
     body: JSON.stringify({ username, password }),
@@ -49,5 +51,6 @@ export async function login(username: string, password: string): Promise<string>
 }
 
 export async function fetchMe(): Promise<Me> {
+  if (MOCK_ENABLED) return mockFetchMe(getToken());
   return request<Me>("/api/auth/me");
 }
