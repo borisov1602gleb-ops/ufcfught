@@ -1,0 +1,392 @@
+/* Экран авторизации «ЛЕКС». Значения — из дизайн-макета (design handoff). */
+
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap");
+
+/* ===== Keyframes ===== */
+@keyframes runLine {
+  from { stroke-dashoffset: calc(var(--dlen) + 70px); }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes fogA {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, -30px) scale(1.15); }
+}
+@keyframes fogB {
+  0%, 100% { transform: translate(0, 0) scale(1.1); }
+  50% { transform: translate(-50px, 30px) scale(1); }
+}
+@keyframes statueGlow {
+  0%, 100% { filter: drop-shadow(0 0 30px rgba(60, 150, 255, 0.25)); }
+  50% { filter: drop-shadow(0 0 55px rgba(80, 170, 255, 0.5)); }
+}
+@keyframes dust {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.6; }
+  100% { transform: translateY(-220px); opacity: 0; }
+}
+@keyframes sheen {
+  0% { transform: translateX(-130%); }
+  100% { transform: translateX(260%); }
+}
+@keyframes borderHue {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+/* ===== Корень ===== */
+.lex {
+  --neon: #22e1ff;
+  --mx: 0;
+  --my: 0;
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  font-family: "Manrope", sans-serif;
+  background: radial-gradient(120% 100% at 25% 15%, #161a2e 0%, #0b0d1a 45%, #05060c 100%);
+}
+
+/* ===== Декоративные слои ===== */
+.lex__wash {
+  position: absolute;
+  inset: -10%;
+  pointer-events: none;
+  background:
+    radial-gradient(40% 50% at 30% 40%, rgba(40, 90, 200, 0.22), transparent 70%),
+    radial-gradient(45% 55% at 70% 65%, rgba(120, 60, 200, 0.18), transparent 70%);
+}
+.lex__fog {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transform: translate(calc(var(--mx) * 34px), calc(var(--my) * 30px));
+}
+.lex__fog-a,
+.lex__fog-b {
+  position: absolute;
+  border-radius: 50%;
+}
+.lex__fog-a {
+  left: 8%;
+  top: 30%;
+  width: 520px;
+  height: 520px;
+  background: radial-gradient(circle, rgba(50, 110, 230, 0.2), transparent 65%);
+  filter: blur(20px);
+  animation: fogA 16s ease-in-out infinite;
+}
+.lex__fog-b {
+  left: 30%;
+  top: 50%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(120, 70, 210, 0.16), transparent 65%);
+  filter: blur(26px);
+  animation: fogB 20s ease-in-out infinite;
+}
+.lex__dust {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transform: translate(calc(var(--mx) * 44px), calc(var(--my) * 40px));
+}
+.lex__dust span {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--neon);
+  box-shadow: 0 0 8px var(--neon);
+  opacity: 0.5;
+}
+
+/* ===== Раскладка ===== */
+.lex__stage {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 40px 64px;
+  max-width: 1320px;
+  margin: 0 auto;
+}
+.lex__figure {
+  flex: 1.1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: translate(calc(var(--mx) * 18px), calc(var(--my) * 16px));
+}
+.lex__svg {
+  width: 440px;
+  max-width: 100%;
+  max-height: 84vh;
+  height: auto;
+  animation: statueGlow 7s ease-in-out infinite;
+  overflow: visible;
+}
+.lex__tracer {
+  --dlen: 0px;
+  stroke-dasharray: 70px var(--dlen);
+  stroke-dashoffset: var(--dlen);
+  animation: runLine var(--tracer-dur, 6s) linear var(--tracer-delay, 0s) infinite;
+}
+
+/* ===== Карточка ===== */
+.lex__card-wrap {
+  flex: 0 0 420px;
+  max-width: 420px;
+  transform: translate(calc(var(--mx) * -8px), calc(var(--my) * -7px));
+}
+.lex__card {
+  position: relative;
+  border-radius: 24px;
+  padding: 44px 40px;
+  background: linear-gradient(160deg, rgba(28, 34, 58, 0.55), rgba(14, 17, 32, 0.45));
+  backdrop-filter: blur(22px) saturate(140%);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  border: 1px solid rgba(150, 180, 255, 0.16);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+.lex__card-accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--neon), transparent);
+  animation: borderHue 4s ease-in-out infinite;
+}
+
+/* Бренд */
+.lex__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 34px;
+}
+.lex__brand-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(150, 180, 255, 0.25);
+  background: radial-gradient(circle at 35% 30%, rgba(120, 160, 255, 0.35), rgba(20, 26, 48, 0.6));
+  box-shadow: 0 0 18px color-mix(in srgb, var(--neon) 45%, transparent);
+}
+.lex__brand-mark span {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 700;
+  font-size: 22px;
+  color: #eaf1ff;
+}
+.lex__brand-name {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #f0f4ff;
+  line-height: 1;
+}
+.lex__brand-tag {
+  font-size: 10.5px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(160, 180, 220, 0.65);
+  margin-top: 4px;
+}
+
+.lex__title {
+  margin: 0 0 8px;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 32px;
+  font-weight: 600;
+  color: #f4f7ff;
+  letter-spacing: 0.3px;
+}
+.lex__subtitle {
+  margin: 0 0 30px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: rgba(176, 190, 220, 0.75);
+  font-weight: 300;
+}
+
+.lex__label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: rgba(165, 185, 225, 0.8);
+  margin-bottom: 9px;
+}
+.lex__input {
+  width: 100%;
+  height: 50px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(150, 180, 255, 0.18);
+  background: rgba(10, 14, 28, 0.5);
+  color: #eef3ff;
+  font-family: "Manrope", sans-serif;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.lex__input::placeholder {
+  color: rgba(150, 170, 210, 0.45);
+}
+.lex__input:focus {
+  border-color: var(--neon);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--neon) 22%, transparent);
+}
+.lex__field {
+  margin-bottom: 22px;
+}
+.lex__pw {
+  position: relative;
+  margin-bottom: 14px;
+}
+.lex__pw .lex__input {
+  padding: 0 46px 0 16px;
+}
+.lex__pw-toggle {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 34px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: rgba(170, 190, 225, 0.7);
+  font-size: 16px;
+}
+.lex__forgot {
+  text-align: right;
+  margin-bottom: 26px;
+}
+.lex__forgot a {
+  font-size: 12.5px;
+  color: var(--neon);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.lex__submit {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 54px;
+  border: none;
+  border-radius: 13px;
+  cursor: pointer;
+  color: #061018;
+  font-family: "Manrope", sans-serif;
+  font-size: 15.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  background: linear-gradient(120deg, var(--neon), color-mix(in srgb, var(--neon) 50%, #7a4dff));
+  box-shadow: 0 0 28px color-mix(in srgb, var(--neon) 55%, transparent), 0 14px 30px rgba(0, 0, 0, 0.45);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.lex__submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 0 40px color-mix(in srgb, var(--neon) 70%, transparent), 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+.lex__submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+.lex__submit:disabled {
+  opacity: 0.75;
+  cursor: default;
+}
+.lex__sheen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  animation: sheen 4.5s ease-in-out 1s infinite;
+  pointer-events: none;
+}
+
+.lex__foot {
+  margin: 26px 0 0;
+  text-align: center;
+  font-size: 13px;
+  color: rgba(176, 190, 220, 0.7);
+  font-weight: 300;
+}
+.lex__foot a {
+  color: var(--neon);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* Состояние ошибки */
+.lex__error {
+  margin: 0 0 18px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 99, 99, 0.4);
+  background: rgba(255, 70, 70, 0.12);
+  color: #ffc9c9;
+  font-size: 13px;
+}
+.lex__input--invalid {
+  border-color: rgba(255, 99, 99, 0.6);
+}
+
+/* Спиннер в кнопке */
+.lex__spinner {
+  display: inline-block;
+  width: 17px;
+  height: 17px;
+  border: 2px solid rgba(6, 16, 24, 0.35);
+  border-top-color: #061018;
+  border-radius: 50%;
+  animation: lex-spin 0.7s linear infinite;
+  vertical-align: -3px;
+}
+@keyframes lex-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== Адаптив ===== */
+@media (max-width: 900px) {
+  .lex__stage {
+    flex-direction: column;
+    justify-content: center;
+    padding: 32px 20px;
+  }
+  .lex__figure {
+    display: none; /* на узких экранах курсора/параллакса нет — фигуру скрываем */
+  }
+  .lex__card-wrap {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 420px;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lex__tracer,
+  .lex__fog-a,
+  .lex__fog-b,
+  .lex__svg,
+  .lex__sheen,
+  .lex__card-accent,
+  .lex__dust span {
+    animation: none !important;
+  }
+}
