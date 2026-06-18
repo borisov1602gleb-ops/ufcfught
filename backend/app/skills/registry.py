@@ -16,6 +16,7 @@ class SkillManifest:
     title: str
     description: str
     icon: str  # имя иконки на фронте
+    tag: str  # короткий бейдж-категория на карточке
     entry_point: str  # маршрут фронтенда, точка входа в навык
     required_permissions: frozenset[Permission] = field(default_factory=frozenset)
 
@@ -26,6 +27,7 @@ SKILLS: list[SkillManifest] = [
         title="Конструктор документов",
         description="Практика → документ → форма с вопросами → готовый .docx",
         icon="file-text",
+        tag="Документы",
         entry_point="/skills/doc-constructor",
         required_permissions=frozenset({Permission.DOC_CONSTRUCTOR_USE}),
     ),
