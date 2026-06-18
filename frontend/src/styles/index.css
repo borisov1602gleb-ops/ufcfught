@@ -1,0 +1,291 @@
+:root {
+  --navy: #0f2a4a;
+  --navy-deep: #0a1f38;
+  --accent: #c8a45c; /* приглушённое золото — юридическая классика */
+  --accent-hover: #d8b878;
+  --bg: #f4f6f9;
+  --card: #ffffff;
+  --text: #1a2433;
+  --text-muted: #6b7686;
+  --border: #dfe4ea;
+  --danger: #c0392b;
+  --danger-bg: #fdecea;
+  --radius: 12px;
+  --shadow: 0 12px 40px rgba(15, 42, 74, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.screen-center {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  color: var(--text-muted);
+}
+
+/* ===== Окно авторизации ===== */
+.auth-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  min-height: 100%;
+}
+
+.auth-brand {
+  background: linear-gradient(150deg, var(--navy) 0%, var(--navy-deep) 100%);
+  color: #fff;
+  padding: 64px 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 24px;
+}
+
+.auth-brand__mark {
+  font-size: 56px;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.auth-brand__title {
+  font-size: 34px;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+  max-width: 11ch;
+}
+
+.auth-brand__subtitle {
+  font-size: 16px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.72);
+  max-width: 42ch;
+  margin: 0;
+}
+
+.auth-panel {
+  display: grid;
+  place-items: center;
+  padding: 40px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 40px 36px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.auth-card__title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.auth-card__hint {
+  margin: -10px 0 6px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.auth-field input {
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  font-size: 15px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.auth-field input:focus {
+  outline: none;
+  border-color: var(--navy);
+  box-shadow: 0 0 0 3px rgba(15, 42, 74, 0.12);
+}
+
+.auth-submit {
+  margin-top: 6px;
+  padding: 13px;
+  border: none;
+  border-radius: 9px;
+  background: var(--navy);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.05s;
+}
+
+.auth-submit:hover:not(:disabled) {
+  background: var(--navy-deep);
+}
+
+.auth-submit:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.auth-submit:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.auth-error {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border: 1px solid #f1c9c4;
+  border-radius: 9px;
+  padding: 11px 14px;
+  font-size: 14px;
+}
+
+.auth-demo {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.auth-demo code {
+  background: var(--bg);
+  padding: 2px 6px;
+  border-radius: 5px;
+  font-size: 12px;
+}
+
+/* ===== Хаб ===== */
+.hub {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+.hub__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+
+.hub__title {
+  margin: 0 0 4px;
+  font-size: 28px;
+}
+
+.hub__user {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.hub__role {
+  color: var(--navy);
+  font-weight: 600;
+}
+
+.hub__logout {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.hub__logout:hover {
+  border-color: var(--navy);
+}
+
+.hub__empty {
+  color: var(--text-muted);
+}
+
+.hub__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.skill-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  cursor: pointer;
+  transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s;
+}
+
+.skill-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+  border-color: transparent;
+}
+
+.skill-card__icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  background: var(--navy);
+  color: var(--accent);
+  border-radius: 10px;
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+
+.skill-card__title {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.skill-card__desc {
+  margin: 0 0 16px;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.skill-card__cta {
+  color: var(--navy);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* ===== Адаптив ===== */
+@media (max-width: 860px) {
+  .auth-layout {
+    grid-template-columns: 1fr;
+  }
+  .auth-brand {
+    padding: 40px 32px;
+  }
+  .auth-brand__title {
+    font-size: 26px;
+  }
+}
