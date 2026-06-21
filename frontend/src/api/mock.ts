@@ -49,11 +49,45 @@ const DEMO: Record<string, DemoUser> = {
   },
 };
 
+// Аккаунты, зарегистрированные в демо-режиме (живут до перезагрузки страницы).
+const REGISTERED: Record<string, DemoUser> = {};
+
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+function lookup(username: string): DemoUser | undefined {
+  const key = username.toLowerCase().trim();
+  return DEMO[key] ?? REGISTERED[key];
+}
+
+export async function mockRegister(
+  username: string,
+  fullName: string,
+  password: string,
+): Promise<string> {
+  await delay(500);
+  const key = username.toLowerCase().trim();
+  if (key.length < 3) throw new ApiError(422, "Логин должен быть не короче 3 символов");
+  if (password.length < 6) throw new ApiError(422, "Пароль должен быть не короче 6 символов");
+  if (fullName.trim().length < 2) throw new ApiError(422, "Укажите ФИО");
+  if (lookup(key)) throw new ApiError(409, "Логин уже занят");
+  REGISTERED[key] = {
+    password,
+    me: {
+      id: `demo-${key}`,
+      username: key,
+      full_name: fullName.trim(),
+      role_id: "lawyer",
+      role_title: "Юрист",
+      permissions: ["doc_constructor:use"],
+      skills: [DOC_SKILL],
+    },
+  };
+  return `mock.${key}`;
+}
 
 export async function mockLogin(username: string, password: string): Promise<string> {
   await delay(450); // имитация сети
-  const user = DEMO[username.toLowerCase().trim()];
+  const user = lookup(username);
   if (!user || user.password !== password) {
     throw new ApiError(401, "Неверный логин или пароль");
   }
@@ -63,7 +97,7 @@ export async function mockLogin(username: string, password: string): Promise<str
 export async function mockFetchMe(token: string | null): Promise<Me> {
   await delay(150);
   const username = token?.startsWith("mock.") ? token.slice(5) : "";
-  const user = DEMO[username];
+  const user = username ? lookup(username) : undefined;
   if (!user) throw new ApiError(401, "Требуется авторизация");
   return user.me;
 }

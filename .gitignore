@@ -14,3 +14,5 @@ frontend/dist/
 
 frontend/tsconfig.tsbuildinfo
 frontend/dist-pages/
+backend/data/
+backend/.venv/
