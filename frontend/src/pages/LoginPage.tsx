@@ -96,7 +96,7 @@ export function LoginPage() {
         </div>
 
         <div className="lex__forgot">
-          <a href="#">Забыли пароль?</a>
+          <Link to="/forgot">Забыли пароль?</Link>
         </div>
 
         <button className="lex__submit" type="submit" disabled={submitting}>

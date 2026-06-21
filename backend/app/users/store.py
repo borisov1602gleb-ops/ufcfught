@@ -37,6 +37,12 @@ def create_user(db: Session, username: str, full_name: str, password: str, role_
     return user
 
 
+def set_password(db: Session, user: User, new_password: str) -> None:
+    user.hashed_password = hash_password(new_password)
+    db.add(user)
+    db.commit()
+
+
 def init_db() -> None:
     """Создать таблицы и засеять демо-учётки. Вызывается при старте приложения."""
     Base.metadata.create_all(bind=engine)

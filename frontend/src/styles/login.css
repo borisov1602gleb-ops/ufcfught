@@ -346,6 +346,33 @@
   border-color: rgba(255, 99, 99, 0.6);
 }
 
+/* Информационное уведомление (например, после запроса сброса) */
+.lex__notice {
+  margin: 0 0 18px;
+  padding: 13px 15px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--neon) 35%, transparent);
+  background: color-mix(in srgb, var(--neon) 10%, transparent);
+  color: #e9f6ff;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.lex__notice-action {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.lex__notice-dev {
+  font-size: 11px;
+  color: rgba(176, 190, 220, 0.7);
+}
+.lex__notice-action a {
+  color: var(--neon);
+  font-weight: 600;
+  text-decoration: none;
+}
+
 /* Спиннер в кнопке */
 .lex__spinner {
   display: inline-block;

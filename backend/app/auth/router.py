@@ -4,13 +4,22 @@ from sqlalchemy.orm import Session
 
 from app.auth.dependencies import get_current_user
 from app.auth.schemas import (
+    ForgotPasswordRequest,
+    ForgotPasswordResponse,
     LoginRequest,
     MeResponse,
     RegisterRequest,
+    ResetPasswordRequest,
     SkillOut,
     TokenResponse,
 )
-from app.core.security import create_access_token, verify_password
+from app.core.config import get_settings
+from app.core.security import (
+    create_access_token,
+    create_reset_token,
+    decode_reset_token,
+    verify_password,
+)
 from app.db import get_db
 from app.rbac.roles import ROLES, permissions_for_role
 from app.skills.registry import skills_for_permissions
@@ -50,6 +59,41 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)) -> TokenResponse
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Неверный логин или пароль",
         )
+    return TokenResponse(access_token=create_access_token(user.username))
+
+
+@router.post("/forgot-password", response_model=ForgotPasswordResponse)
+def forgot_password(
+    payload: ForgotPasswordRequest, db: Session = Depends(get_db)
+) -> ForgotPasswordResponse:
+    # Не раскрываем, существует ли логин (защита от перебора): ответ всегда общий.
+    generic = "Если такой логин существует, ссылка для сброса пароля отправлена."
+    user = store.get_by_username(db, payload.username.strip().lower())
+    if user is None:
+        return ForgotPasswordResponse(message=generic, reset_token=None)
+
+    token = create_reset_token(user.username)
+    # В проде здесь отправляется письмо со ссылкой; в dev/демо возвращаем токен.
+    expose = get_settings().expose_reset_token
+    return ForgotPasswordResponse(message=generic, reset_token=token if expose else None)
+
+
+@router.post("/reset-password", response_model=TokenResponse)
+def reset_password(payload: ResetPasswordRequest, db: Session = Depends(get_db)) -> TokenResponse:
+    username = decode_reset_token(payload.token)
+    if username is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Ссылка недействительна или устарела",
+        )
+    user = store.get_by_username(db, username)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Ссылка недействительна или устарела",
+        )
+    store.set_password(db, user, payload.new_password)
+    # Сразу выдаём access-токен — пользователь входит с новым паролем.
     return TokenResponse(access_token=create_access_token(user.username))
 
 
