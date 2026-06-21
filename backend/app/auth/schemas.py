@@ -18,6 +18,22 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
 
 
+class ForgotPasswordRequest(BaseModel):
+    username: str
+
+
+class ForgotPasswordResponse(BaseModel):
+    message: str
+    # Только для dev/демо (нет почтового сервера): токен сброса возвращается
+    # прямо в ответе. В проде поле остаётся None, а ссылка уходит на email.
+    reset_token: str | None = None
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str = Field(min_length=6, max_length=128)
+
+
 class SkillOut(BaseModel):
     id: str
     title: str

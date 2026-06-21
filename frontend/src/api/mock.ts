@@ -94,6 +94,29 @@ export async function mockLogin(username: string, password: string): Promise<str
   return `mock.${user.me.username}`;
 }
 
+const FORGOT_MESSAGE = "Если такой логин существует, ссылка для сброса пароля отправлена.";
+
+export async function mockForgotPassword(
+  username: string,
+): Promise<{ message: string; reset_token: string | null }> {
+  await delay(400);
+  const user = lookup(username);
+  return {
+    message: FORGOT_MESSAGE,
+    reset_token: user ? `reset.${user.me.username}` : null,
+  };
+}
+
+export async function mockResetPassword(token: string, newPassword: string): Promise<string> {
+  await delay(450);
+  const username = token.startsWith("reset.") ? token.slice(6) : "";
+  const user = username ? lookup(username) : undefined;
+  if (!user) throw new ApiError(400, "Ссылка недействительна или устарела");
+  if (newPassword.length < 6) throw new ApiError(422, "Пароль должен быть не короче 6 символов");
+  user.password = newPassword;
+  return `mock.${user.me.username}`;
+}
+
 export async function mockFetchMe(token: string | null): Promise<Me> {
   await delay(150);
   const username = token?.startsWith("mock.") ? token.slice(5) : "";

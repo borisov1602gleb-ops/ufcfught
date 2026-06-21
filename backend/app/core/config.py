@@ -15,6 +15,10 @@ class Settings(BaseSettings):
     # CORS: адреса фронтенда, которым разрешён доступ к API.
     cors_origins: list[str] = ["http://localhost:5173", "http://127.0.0.1:5173"]
 
+    # Dev/демо: возвращать токен сброса пароля прямо в ответе API (нет почтового
+    # сервера). В проде ставить False — ссылка будет уходить на email.
+    expose_reset_token: bool = True
+
 
 @lru_cache
 def get_settings() -> Settings:
